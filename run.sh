@@ -1,5 +1,13 @@
 #!/bin/bash
 
+
+#Change permissions icingaweb2 and icinga2 custom configuration folder
+service mysql stop
+chmod 777 /icingaweb2/* -R
+chmod 777 /icinga2conf/* -R
+chmod 777 /mysql
+service mysql start
+
 #Check env
 if [ -z "$ICINGA_PASS" ]; then
 	export ICINGA_PASS="icinga"
@@ -123,6 +131,7 @@ sed -i "s/myhostname.*/myhostname=$HOSTNAME/g" /etc/postfix/main.cf
 #Change permissions icingaweb2 and icinga2 custom configuration folder
 chmod 777 /icingaweb2/* -R
 chmod 777 /icinga2conf/* -R
+chmod 777 /mysql
 
 
 
