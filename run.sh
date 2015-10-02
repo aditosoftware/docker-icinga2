@@ -112,7 +112,7 @@ service mysql restart
 echo "update icingaweb_user set password_hash='$pass' where name='icingaadmin';" >> ~/usergen.sql
 mysql -u root -proot icingaweb < ~/usergen.sql
 rm -f ~/usergen.sql
-chmod mysql:mysql -R /mysql
+chown mysql:mysql -R /mysql
 
 #Change Graphite host
 sed -i "3s#base.*#base_url=http://$GRAPHITE_HOST/render?#" /etc/icingaweb2/modules/graphite/config.ini
