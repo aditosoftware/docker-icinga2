@@ -190,7 +190,7 @@ echo 'permissions = "*"' >> /etc/icingaweb2/roles.ini
 echo 'groups = "Administrators"' >> /etc/icingaweb2/roles.ini
 
 #Configuration Icingaweb Modules
-sed "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
+sed -i "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
 mkdir -p /etc/icingaweb2/modules/monitoring
 mkdir -p /etc/icingaweb2/enabledModules
 
