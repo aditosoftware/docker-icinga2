@@ -143,6 +143,8 @@ else
 	fi
 fi
 
+mv /etc/icinga2/conf.d/users.conf /icinga2conf/
+ln -s /icinga2conf/users.conf /etc/icinga2/conf.d/users.conf
 
 htpasswd -b /etc/icinga2-classicui/htpasswd.users icingaadmin $ICINGA_PASS
 pass=$(openssl passwd -1 $ICINGA_PASS)
