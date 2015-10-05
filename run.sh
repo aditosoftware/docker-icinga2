@@ -162,6 +162,7 @@ sed -i "3s#base.*#base_url=http://$GRAPHITE_HOST/render?#" /etc/icingaweb2/modul
 sed -i "s/myhostname.*/myhostname=$HOSTNAME/g" /etc/postfix/main.cf
 
 #Change permissions icingaweb2 and icinga2 custom configuration folder
+sed -i "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
 chmod 777 /icingaweb2/* -R
 chmod 777 /icinga2conf/* -R
 chmod 777 /mysql
