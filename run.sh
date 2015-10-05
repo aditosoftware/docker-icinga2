@@ -54,7 +54,7 @@ if [ -z "$NSCAPORT" ]; then
 else
 	sed -i "s/server_port.*/server_port=$NSCAPORT/g" /etc/nsca.cfg
 fi
-if [ $ENABLE_AD_AUTH -eq "1" ]; then
+if [[ $ENABLE_AD_AUTH -eq "1" ]]; then
 	#Add AD Auth (resources.ini)
 	if [[ -e /icingaweb2 ]]; then
 		if [[ -s /icingaweb2/resources.ini ]]; then
@@ -112,16 +112,32 @@ else
 	if [[ -s /icingaweb2/resources.ini ]]; then
 			rm /etc/icingaweb2/resources.ini
 			ln -s /icingaweb2/resources.ini /etc/icingaweb2/resources.ini
+	else
+			cp /etc/icingaweb2/resources.ini /icingaweb2/resources.ini
+			rm /etc/icingaweb2/resources.ini
+			ln -s /icingaweb2/resources.ini /etc/icingaweb2/resources.ini
 	fi
 	if [[ -s /icingaweb2/authentication.ini ]]; then
+			rm /etc/icingaweb2/authentication.ini
+			ln -s /icingaweb2/authentication.ini /etc/icingaweb2/authentication.ini
+	else
+			cp /etc/icingaweb2/authentication.ini /icingaweb2/authentication.ini
 			rm /etc/icingaweb2/authentication.ini
 			ln -s /icingaweb2/authentication.ini /etc/icingaweb2/authentication.ini
 	fi
 	if [[ -s /icingaweb2/roles.ini ]]; then
 			rm /etc/icingaweb2/roles.ini
 			ln -s /icingaweb2/roles.ini /etc/icingaweb2/roles.ini
+	else
+			cp /etc/icingaweb2/roles.ini /icingaweb2/roles.ini
+			rm /etc/icingaweb2/roles.ini
+			ln -s /icingaweb2/roles.ini /etc/icingaweb2/roles.ini
 	fi
 	if [[ -s /icingaweb2/groups.ini ]]; then
+		rm /etc/icingaweb2/groups.ini
+		ln -s /icingaweb2/groups.ini /etc/icingaweb2/groups.ini
+	else
+		cp /etc/icingaweb2/groups.ini /icingaweb2/groups.ini
 		rm /etc/icingaweb2/groups.ini
 		ln -s /icingaweb2/groups.ini /etc/icingaweb2/groups.ini
 	fi
