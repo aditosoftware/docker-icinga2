@@ -6,27 +6,27 @@ This is a Docker container with Icinga2 (Icingaweb2 and Icinag2-Classicui), Grap
 
   Enable Active Directory Auth. You need the folder "/icingaweb2" in container.
 
-    ENABLE_AD_AUTH=1
+    ENABLE_AD_AUTH=1 (optional)
   
   Active Directory name or name of a domain controller
   
-    AD_NAME=example.com
+    AD_NAME=example.com (optional)
   
   AD OU for Icingaweb2 Auth Users:
     
-    AD_ROOT_DN=OU=accounts,OU=intern,DC=example,DC=com
+    AD_ROOT_DN=OU=accounts,OU=intern,DC=example,DC=com (optional)
   
   Path for User (only to list ad users)
     
-    AD_BIND_DN=CN=aduser,OU=management,OU=accounts,OU=intern,DC=excample,DC=com
+    AD_BIND_DN=CN=aduser,OU=management,OU=accounts,OU=intern,DC=excample,DC=com (optional)
   
   Password for user
   
-    AD_BIND_PW=PASSWORDHERE
+    AD_BIND_PW=PASSWORDHERE (optional)
   
-  Graphite host with port. Graphite is installed in container you need here the ip from Docker container and port
+  Graphite host with port. Graphite is installed in container you need to change here the ip to Docker container and port
   
-    GRAPHITE_HOST=192.168.100.203:80
+    GRAPHITE_HOST=192.168.100.203:80 
   
   Icinga2 password for "icingaadmin"
   
@@ -34,23 +34,25 @@ This is a Docker container with Icinga2 (Icingaweb2 and Icinag2-Classicui), Grap
   
   Mailserver for Email notifications. 
   
-    MAILSERVER=mail.example.com
+    MAILSERVER=mail.example.com (optional)
   
   Email address for icingaadmin user
   
-    EMAILADDR=user@example.com
+    EMAILADDR=user@example.com (optional)
   
   NSCA (passive checks) is enabled. Password
     
-    NSCAPASS=pass
+    NSCAPASS=pass (optional)
   
   NSCA Port
     
-    NSCAPORT=5667
+    NSCAPORT=5667 (optional)
     
   !Define host name
   
     docker run -h "hostname"
+    
+  You need to define folder: /icingaweb2, /icinga2conf, /mysql  
     
 ## Example
   

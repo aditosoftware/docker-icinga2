@@ -107,7 +107,24 @@ if [ $ENABLE_AD_AUTH -eq "1" ]; then
 		echo "[AD]" >> /etc/icingaweb2/resources.ini
 		echo "resource = \"ad\" " >> /etc/icingaweb2/authentication.ini
 		echo "backend = \"msldap\" " >> /etc/icingaweb2/authentication.ini
-	fi	
+	fi
+else
+	if [[ -s /icingaweb2/resources.ini ]]; then
+			rm /etc/icingaweb2/resources.ini
+			ln -s /icingaweb2/resources.ini /etc/icingaweb2/resources.ini
+	fi
+	if [[ -s /icingaweb2/authentication.ini ]]; then
+			rm /etc/icingaweb2/authentication.ini
+			ln -s /icingaweb2/authentication.ini /etc/icingaweb2/authentication.ini
+	fi
+	if [[ -s /icingaweb2/roles.ini ]]; then
+			rm /etc/icingaweb2/roles.ini
+			ln -s /icingaweb2/roles.ini /etc/icingaweb2/roles.ini
+	fi
+	if [[ -s /icingaweb2/groups.ini ]]; then
+		rm /etc/icingaweb2/groups.ini
+		ln -s /icingaweb2/groups.ini /etc/icingaweb2/groups.ini
+	fi
 fi
 
 
