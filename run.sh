@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #Change permissions icingaweb2 and icinga2 custom configuration folder
 service mysql stop
 chmod 777 /icingaweb2/* -R
@@ -9,33 +8,37 @@ chmod 777 /mysql
 service mysql start
 
 #Check env
+#check Icingaadmin password
 if [ -z "$ICINGA_PASS" ]; then
 	export ICINGA_PASS="icinga"
 	echo "Set icingaadmin pass to icinga"
 else
 	echo $ICINGA_PASS
 fi
+#check graphitehost variable
 if [ -z "GRAPHITE_HOST" ]; then
 	echo "Graphite Host not defined.Exit"
 	exit
 else
 	echo $GRAPHITE_HOST
 fi
+#check mailserver variable
 if [ -z "MAILSERVER" ]; then
 	echo "Mailserver not defined"
 else
-	#Add email forwarding to $MAILSERVER
-	echo "*       smtp:'$MAILSERVER'" > /etc/postfix/transport
-	postmap /etc/postfix/transport
+	#Define mailsend command and write this to /etc/icinga2/scripts/mail-host-notification.sh
+	sed -i 's#/usr/bin/.*#/usr/bin/printf \"%b\" \"$template\" | mailx -r '\"$EMAILADDR\"' -s \"$NOTIFICATIONTYPE - $HOSTDISPLAYNAME is $HOSTSTATE\" -S smtp='\"$MAILSERVER\"' $USEREMAIL#g' /etc/icinga2/scripts/mail-host-notification.sh
+  sed -i 's#/usr/bin/.*#/usr/bin/printf \"%b\" \"$template\" | mailx -r '\"$EMAILADDR\"' -s \"$NOTIFICATIONTYPE - $HOSTDISPLAYNAME - $SERVICEDISPLAYNAME is $SERVICESTATE\" -S smtp='\"$MAILSERVER\"' $USEREMAIL#g' /etc/icinga2/scripts/mail-service-notification.sh
 fi
+#check email variable
 if [ -z "$EMAILADDR" ]; then
 	echo "Email for icingaadmin not defined"
 else
+	sed -i "11s/.*/enable_notifications = true/g" /etc/icinga2/conf.d/users.conf
 	sed -i 's/'"root@localhost"'/'"$EMAILADDR"'/' /etc/icinga2/conf.d/users.conf
+
 fi
-if [[ ! -e /icinga2conf/externalcommands ]]; then
-    mkdir /icinga2conf/externalcommands
-fi
+#check if /mysql folder is defined
 if [[ -e /mysql ]]; then
 	service mysql stop
 	cp -R /var/lib/mysql/* /mysql/
@@ -44,16 +47,19 @@ else
 	service mysql stop
 	sed -i "s#datadir.*#datadir = /mysql#g" /etc/mysql/my.cnf
 fi
+#check if NSCA Password is defined
 if [ -z "$NSCAPASS" ]; then
 	echo "nsca password not defined"
 else
 	echo "password=$NSCAPASS" >> /etc/nsca.cfg
 fi
+#check if NSCA Port ist defined. If not define set stardardport 5667
 if [ -z "$NSCAPORT" ]; then
-	echo "nsca port not defined"
+	sed -i "s/server_port.*/server_port=5667/g" /etc/nsca.cfg
 else
 	sed -i "s/server_port.*/server_port=$NSCAPORT/g" /etc/nsca.cfg
 fi
+#check if AD Auth is enabled
 if [[ $ENABLE_AD_AUTH -eq "1" ]]; then
 	#Add AD Auth (resources.ini)
 	if [[ -e /icingaweb2 ]]; then
@@ -142,16 +148,52 @@ else
 		ln -s /icingaweb2/groups.ini /etc/icingaweb2/groups.ini
 	fi
 fi
-if [[ -s /etc/icinga2/conf.d/users.conf ]]; then
+if [[ ! -s /icinga2conf/users.conf ]]; then
 	mv /etc/icinga2/conf.d/users.conf /icinga2conf/users.conf
 fi
+if [[ ! -s /icinga2conf/passive.conf ]]; then
+	#Icinga2 Passive Check template (Host and Service)
+	echo "template Service \"passive-service\" { " > /icinga2conf/users.conf
+	echo "        max_check_attempts = 1" >> /icinga2conf/users.conf
+	echo "        retry_interval = 1m " >> /icinga2conf/users.conf
+	echo "        check_interval = 1m " >> /icinga2conf/users.conf
+	echo " " >> /icinga2conf/users.conf
+	echo "        enable_active_checks = false " >> /icinga2conf/users.conf
+	echo " " >> /icinga2conf/users.conf
+	echo "        check_command = \"dummy\" " >> /icinga2conf/users.conf
+	echo " " >> /icinga2conf/users.conf
+	echo "        vars.dummy_state = 2 " >> /icinga2conf/users.conf
+	echo "        vars.dummy_text = \"No Passive Check Result Received.\" " >> /icinga2conf/users.conf
+	echo "	vars.notification[\"mail\"] = { " >> /icinga2conf/users.conf
+  echo "	groups = [ \"icingaadmins\" ] " >> /icinga2conf/users.conf
+  echo "	} " >> /icinga2conf/users.conf
+	echo "} " >> /icinga2conf/users.conf
+	echo " " >> /icinga2conf/users.conf
+	echo "template Host \"passive-host\" { " >> /icinga2conf/users.conf
+	echo "        max_check_attempts = 1 " >> /icinga2conf/users.conf
+	echo "        retry_interval = 1m " >> /icinga2conf/users.conf
+	echo "        check_interval = 2m " >> /icinga2conf/users.conf
+	echo " " >> /icinga2conf/users.conf
+	echo "        enable_active_checks = false " >> /icinga2conf/users.conf
+	echo " " >> /icinga2conf/users.conf
+	echo "        check_command = \"dummy\" " >> /icinga2conf/users.conf
+	echo " " >> /icinga2conf/users.conf
+	echo "        vars.dummy_state = 2 " >> /icinga2conf/users.conf
+	echo "        vars.dummy_text = \"No Passive Check Result Received.\" " >> /icinga2conf/users.conf
+	echo "	vars.notification[\"mail\"] = { " >> /icinga2conf/users.conf
+  echo "	groups = [ \"icingaadmins\" ] " >> /icinga2conf/users.conf
+  echo "	} " >> /icinga2conf/users.conf
+	echo "} " >> /icinga2conf/users.conf
+fi
 
+#Set password for icinga2-classicui (http://server.local/icinga2-classicui
 htpasswd -b /etc/icinga2-classicui/htpasswd.users icingaadmin $ICINGA_PASS
+#Generate password hash for icingaweb user (http://server.local/icinga2-classicui)
 pass=$(openssl passwd -1 $ICINGA_PASS)
 
 service mysql restart
 
-#Change Icinga user password
+#Update Icingaweb2 user password
 echo "update icingaweb_user set password_hash='$pass' where name='icingaadmin';" >> ~/usergen.sql
 mysql -u root -proot icingaweb < ~/usergen.sql
 rm -f ~/usergen.sql
@@ -160,22 +202,16 @@ chown mysql:mysql -R /mysql
 #Change Graphite host
 sed -i "3s#base.*#base_url=http://$GRAPHITE_HOST/render?#" /etc/icingaweb2/modules/graphite/config.ini
 
-#Change postfix hostname
-sed -i "s/myhostname.*/myhostname=$HOSTNAME/g" /etc/postfix/main.cf
-
 #Change permissions icingaweb2 and icinga2 custom configuration folder
 sed -i "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
 chmod 777 /icingaweb2/* -R
 chmod 777 /icinga2conf/* -R
 chmod 777 /mysql
 
-
-
 #Restart service
 service apache2 restart
 service icinga2 restart
 service carbon-cache restart
-service postfix restart
 service nsca stop
 
 exec nsca -c /etc/nsca.cfg -f --daemon

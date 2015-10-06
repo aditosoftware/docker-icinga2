@@ -13,7 +13,7 @@ fi
 
 #Icinga-trusty i386 amd64
 apt-get update
-apt-get install python-software-properties software-properties-common apache2 nano postfix nsca -y
+apt-get install python-software-properties software-properties-common apache2 nano heirloom-mailx nsca -y
 add-apt-repository ppa:formorer/icinga -y
 
 # Patchen des Systems
@@ -24,10 +24,6 @@ apt-get upgrade -y
 # Installation icinga2
 apt-get install icinga2 -y
 apt-get install nagios-nrpe-plugin --no-install-recommends -y
-
-#Add Icinga2 config folder
-echo 'include_recursive "/icinga2conf"' >> /etc/icinga2/icinga2.conf
-mkdir -p /icinga2conf/externalcommands
 
 #Add custom command folder (var CustomPlugin)
 echo '/*Custom command folder */' >> /etc/icinga2/constants.conf
@@ -93,7 +89,6 @@ a2enmod rewrite
 service apache2 restart
 
 #Zendframework in den php.ini anpassen
-
 echo "include_path = ".:/usr/share/php:/usr/share/php/libzend-framework-php/"" >> /etc/php5/cli/php.ini
 echo "include_path = ".:/usr/share/php:/usr/share/php/libzend-framework-php/"" >> /etc/php5/apache2/php.ini
 
@@ -309,45 +304,6 @@ echo 'graphite_args_template = "&target=$target$&source=0&width=300&height=120&h
 #NSCA /var/run/icinga2/cmd/icinga2.cmd
 sed -i 's#command_file.*#command_file=/var/run/icinga2/cmd/icinga2.cmd#g' /etc/nsca.cfg
 
-#Icinga2 Passive Check template (Host and Service)
-echo "template Service \"passive-service\" { " > /etc/icinga2/conf.d/passive.conf
-echo "        max_check_attempts = 1" >> /etc/icinga2/conf.d/passive.conf
-echo "        retry_interval = 1m " >> /etc/icinga2/conf.d/passive.conf
-echo "        check_interval = 1m " >> /etc/icinga2/conf.d/passive.conf
-echo " " >> /etc/icinga2/conf.d/passive.conf
-echo "        enable_active_checks = false " >> /etc/icinga2/conf.d/passive.conf
-echo " " >> /etc/icinga2/conf.d/passive.conf
-echo "        check_command = \"dummy\" " >> /etc/icinga2/conf.d/passive.conf
-echo " " >> /etc/icinga2/conf.d/passive.conf
-echo "        vars.dummy_state = 2 " >> /etc/icinga2/conf.d/passive.conf
-echo "        vars.dummy_text = \"No Passive Check Result Received.\" " >> /etc/icinga2/conf.d/passive.conf
-echo "} " >> /etc/icinga2/conf.d/passive.conf
-echo " " >> /etc/icinga2/conf.d/passive.conf
-echo "template Host \"passive-host\" { " >> /etc/icinga2/conf.d/passive.conf
-echo "        max_check_attempts = 1 " >> /etc/icinga2/conf.d/passive.conf
-echo "        retry_interval = 1m " >> /etc/icinga2/conf.d/passive.conf
-echo "        check_interval = 2m " >> /etc/icinga2/conf.d/passive.conf
-echo " " >> /etc/icinga2/conf.d/passive.conf
-echo "        enable_active_checks = false " >> /etc/icinga2/conf.d/passive.conf
-echo " " >> /etc/icinga2/conf.d/passive.conf
-echo "        check_command = \"dummy\" " >> /etc/icinga2/conf.d/passive.conf
-echo " " >> /etc/icinga2/conf.d/passive.conf
-echo "        vars.dummy_state = 2 " >> /etc/icinga2/conf.d/passive.conf
-echo "        vars.dummy_text = \"No Passive Check Result Received.\" " >> /etc/icinga2/conf.d/passive.conf
-echo "} " >> /etc/icinga2/conf.d/passive.conf
-
-
 graphite-manage syncdb --noinput
 service icinga2 restart
 unset DEBIAN_FRONTEND
-
-echo "####################"
-echo "####################"
-echo " "
-echo "Finish"
-echo 'Graphite Host: not defined. Start Container with -e $GRAPHITE_HOST=graphite_host_name:port (if not 80))'
-echo "Icinga2 Web: http://host/icingaweb2/, User: Icingaadmin, Pass: $ICINGA_PASS"
-echo "Icinga Classic: http://host/icinga2-classicui/, User: Icingaadmin, Pass: $ICINGA_PASS"
-echo " "
-echo "####################"
-echo "####################"
