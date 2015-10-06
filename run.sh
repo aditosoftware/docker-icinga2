@@ -31,7 +31,6 @@ fi
 if [ -z "$EMAILADDR" ]; then
 	echo "Email for icingaadmin not defined"
 else
-	mv /etc/icinga2/conf.d/users.conf /icinga2conf/users.conf
 	sed -i 's/'"root@localhost"'/'"$EMAILADDR"'/' /etc/icinga2/conf.d/users.conf
 fi
 if [[ ! -e /icinga2conf/externalcommands ]]; then
@@ -142,6 +141,9 @@ else
 		rm /etc/icingaweb2/groups.ini
 		ln -s /icingaweb2/groups.ini /etc/icingaweb2/groups.ini
 	fi
+fi
+if [[ -s /etc/icinga2/conf.d/users.conf ]]; then
+	mv /etc/icinga2/conf.d/users.conf /icinga2conf/users.conf
 fi
 
 htpasswd -b /etc/icinga2-classicui/htpasswd.users icingaadmin $ICINGA_PASS
