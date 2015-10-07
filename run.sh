@@ -27,8 +27,8 @@ if [ -z "MAILSERVER" ]; then
 	echo "Mailserver not defined"
 else
 	#Define mailsend command and write this to /etc/icinga2/scripts/mail-host-notification.sh
-	sed -i 's#/usr/bin/.*#/usr/bin/printf \"%b\" \"$template\" | mailx -r '\"$EMAILADDR\"' -s \"$NOTIFICATIONTYPE - $HOSTDISPLAYNAME is $HOSTSTATE\" -S smtp='\"$MAILSERVER\"' $USEREMAIL#g' /etc/icinga2/scripts/mail-host-notification.sh
-  sed -i 's#/usr/bin/.*#/usr/bin/printf \"%b\" \"$template\" | mailx -r '\"$EMAILADDR\"' -s \"$NOTIFICATIONTYPE - $HOSTDISPLAYNAME - $SERVICEDISPLAYNAME is $SERVICESTATE\" -S smtp='\"$MAILSERVER\"' $USEREMAIL#g' /etc/icinga2/scripts/mail-service-notification.sh
+	sed -i 's#/usr/bin/.*#/usr/bin/printf \"%b\" \"$template\" | mailx -r '\"monitoring@$HOSTNAME\"' -s \"$NOTIFICATIONTYPE - $HOSTDISPLAYNAME is $HOSTSTATE\" -S smtp='\"$MAILSERVER\"' $USEREMAIL#g' /etc/icinga2/scripts/mail-host-notification.sh
+  sed -i 's#/usr/bin/.*#/usr/bin/printf \"%b\" \"$template\" | mailx -r '\"monitoring@$HOSTNAME\"' -s \"$NOTIFICATIONTYPE - $HOSTDISPLAYNAME - $SERVICEDISPLAYNAME is $SERVICESTATE\" -S smtp='\"$MAILSERVER\"' $USEREMAIL#g' /etc/icinga2/scripts/mail-service-notification.sh
 fi
 #check email variable
 if [ -z "$EMAILADDR" ]; then
@@ -150,7 +150,10 @@ else
 fi
 if [[ ! -s /icinga2conf/users.conf ]]; then
 	mv /etc/icinga2/conf.d/users.conf /icinga2conf/users.conf
+else
+	rm -f /etc/icinga2/conf.d/users.conf
 fi
+
 if [[ ! -s /icinga2conf/passive.conf ]]; then
 	#Icinga2 Passive Check template (Host and Service)
 	echo "template Service \"passive-service\" { " > /icinga2conf/passive.conf
