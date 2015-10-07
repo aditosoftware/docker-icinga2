@@ -52,6 +52,10 @@ This is a Docker container with Icinga2 (Icingaweb2 and Icinag2-Classicui), Grap
   
     docker run -h "hostname"
     
+  For time sync
+    
+    -v /etc/localtime:/etc/localtime:ro
+    
 ### Folder
 
     - /icingaweb2
