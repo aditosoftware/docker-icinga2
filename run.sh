@@ -215,10 +215,11 @@ htpasswd -b /etc/icinga2-classicui/htpasswd.users icingaadmin $ICINGA_PASS
 #Generate password hash for icingaweb user (http://server.local/icinga2-classicui)
 pass=$(openssl passwd -1 $ICINGA_PASS)
 
-service mysql restart
+service mysql start
 
 #Update Icingaweb2 user password
 echo "update icingaweb_user set password_hash='$pass' where name='icingaadmin';" >> ~/usergen.sql
+
 mysql -u root -proot icingaweb < ~/usergen.sql
 rm -f ~/usergen.sql
 chown mysql:mysql -R /mysql
