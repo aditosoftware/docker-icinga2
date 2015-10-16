@@ -215,7 +215,7 @@ htpasswd -b /etc/icinga2-classicui/htpasswd.users icingaadmin $ICINGA_PASS
 #Generate password hash for icingaweb user (http://server.local/icinga2-classicui)
 pass=$(openssl passwd -1 $ICINGA_PASS)
 
-service mysql restart
+service mysql start
 
 #Update Icingaweb2 user password
 echo "update icingaweb_user set password_hash='$pass' where name='icingaadmin';" >> ~/usergen.sql
@@ -231,7 +231,7 @@ sed -i "3s#base.*#base_url=http://$GRAPHITE_HOST/render?#" /etc/icingaweb2/modul
 sed -i "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
 chmod 777 /icingaweb2/* -R
 chmod 777 /icinga2conf/* -R
-chmod 777 /mysql
+chmod 777 /mysql/* -R
 
 #Restart service
 service apache2 restart
