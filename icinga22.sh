@@ -26,10 +26,6 @@ apt-get upgrade -y
 apt-get install icinga2 -y
 apt-get install nagios-nrpe-plugin --no-install-recommends -y
 
-#Add custom command folder (var CustomPlugin)
-echo '/*Custom command folder */' >> /etc/icinga2/constants.conf
-echo 'const CustomPlugin = "/icinga2conf/externalcommands"' >> /etc/icinga2/constants.conf
-
 #Add /icinga2conf
 echo "include_recursive \"/icinga2conf\"" >> /etc/icinga2/icinga2.conf
 

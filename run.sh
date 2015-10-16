@@ -220,15 +220,12 @@ service mysql start
 #Update Icingaweb2 user password
 echo "update icingaweb_user set password_hash='$pass' where name='icingaadmin';" >> ~/usergen.sql
 
-mysql -u root -proot icingaweb < ~/usergen.sql
-rm -f ~/usergen.sql
-chown mysql:mysql -R /mysql
-
 #Change Graphite host
 sed -i "3s#base.*#base_url=http://$GRAPHITE_HOST/render?#" /etc/icingaweb2/modules/graphite/config.ini
 
 #Change permissions icingaweb2 and icinga2 custom configuration folder
 sed -i "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
+
 chmod 777 /icingaweb2/* -R
 chmod 777 /icinga2conf/* -R
 chmod 777 /mysql/* -R
@@ -237,6 +234,11 @@ chmod 777 /mysql/* -R
 service apache2 restart
 service icinga2 restart
 service mysql restart
+
+mysql -u root -proot icingaweb < ~/usergen.sql
+rm -f ~/usergen.sql
+chown mysql:mysql -R /mysql
+
 service carbon-cache restart
 service nsca stop
 
