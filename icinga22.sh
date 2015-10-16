@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Olaf Assmus
 # optimiert Ubuntu 14.04.02 LTS x64
 #
@@ -207,6 +208,7 @@ echo 'protected_customvars = "*pw*,*pass*,community"' >> /etc/icingaweb2/modules
 
 #Enable Monitoring Modules
 ln -s /usr/share/icingaweb2/modules/monitoring/ /etc/icingaweb2/enabledModules/monitoring
+ln -s /usr/share/icingaweb2/modules/iframe/ /etc/icingaweb2/enabledModules/iframe
 
 ###################################################### Graphite und Icinga2 Graphite Modul Installation ######################################################
 

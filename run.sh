@@ -39,12 +39,33 @@ else
 
 fi
 #check if /mysql folder is defined
-if [[ -e /mysql ]]; then
+if [[ ! -e /mysql ]]; then
 	service mysql stop
-	cp -R /var/lib/mysql/* /mysql/
+	mkdir /mysqltemp
+	cp -R /var/lib/mysql/* /mysqltemp/
+
+	if [[ ! -e /mysql/icingaweb ]]; then
+		cp -R /var/lib/icingaweb /mysqltemp/icingaweb
+	fi
+	if [[ ! -e /mysql/icinga2idomysql ]]; then
+		cp -R /var/lib/icinga2idomysql /mysqltemp/icinga2idomysql
+	fi
+	if [[ ! -e /mysql/graphite ]]; then
+		cp -R /var/lib/graphite /mysqltemp/graphite
+	fi
+	rm -R /mysql/*
+	cp -R /mysqltemp/ /mysql
+	rm -Rf /mysqltemp
+
 	sed -i "s#datadir.*#datadir = /mysql#g" /etc/mysql/my.cnf
 else
 	service mysql stop
+	mkdir /mysqltemp
+	cp -R /var/lib/mysql/* /mysqltemp/
+	cp -R /mysql/* /mysqltemp/
+	rm -R /mysql/*
+	cp -R /mysqltemp/* /mysql/
+	rm -Rf /mysqltemp
 	sed -i "s#datadir.*#datadir = /mysql#g" /etc/mysql/my.cnf
 fi
 #check if NSCA Password is defined
