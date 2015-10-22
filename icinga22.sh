@@ -9,7 +9,7 @@ ICINGA_PASS="icinga"
 
 #Icinga-trusty i386 amd64
 apt-get update
-apt-get install python-software-properties software-properties-common apache2 nano heirloom-mailx nsca -y
+apt-get install python-software-properties software-properties-common apache2 vim heirloom-mailx nsca -y
 add-apt-repository ppa:formorer/icinga -y
 
 # Patchen des Systems

@@ -28,6 +28,10 @@ This is a Docker container with Icinga2 (Icingaweb2 and Icinag2-Classicui), Grap
   
     GRAPHITE_HOST=192.168.100.203:80 
   
+  Notification Periode (0 for disable, default 30Min)(optional). If set to 0, Icinga will send notificaton only if status of service is changed.
+  
+    NOTIFICATION_INTERVAL=0
+  
   Icinga2 password for "icingaadmin"
   
     ICINGA_PASS=icinga
@@ -60,7 +64,7 @@ This is a Docker container with Icinga2 (Icingaweb2 and Icinag2-Classicui), Grap
 
     - /icingaweb2
     - /icinga2conf
-    - /mysql (optional)
+    - /mysql
        
     
 ## Example
@@ -69,7 +73,7 @@ This is a Docker container with Icinga2 (Icingaweb2 and Icinag2-Classicui), Grap
     -v /storage/icingaweb2:/icingaweb2 -v /storage/icinga2:/icinga2conf -v /storage/mysql:/mysql \
     -e ENABLE_AD_AUTH="1" -e AD_NAME="example.com" -e AD_ROOT_DN="OU=accounts,OU=intern,DC=example,DC=com" \
     -e AD_BIND_DN="CN=Icinga2 Auth,OU=accounts,OU=intern,DC=example,DC=com" -e AD_BIND_PW="PASSWORDHERE" \
-    -e GRAPHITE_HOST=192.168.100.61:80 -e ICINGA_PASS="icinga" -e MAILSERVER="mail.example.com" \
+    -e NOTIFICATION_INTERVAL=0 -e GRAPHITE_HOST=192.168.100.61:80 -e ICINGA_PASS="icinga" -e MAILSERVER="mail.example.com" \
     -e EMAILADDR="user@example.com" -e NSCAPASS="pass" -e NSCAPORT="5667" \
     --name icinga2 -t adito/icinga2
 
@@ -77,7 +81,7 @@ This is a Docker container with Icinga2 (Icingaweb2 and Icinag2-Classicui), Grap
 
     sudo docker run -i -p 80:80 -p 5667:5667 -h monitoring.example.com \
     -v /storage/icingaweb2:/icingaweb2 -v /storage/icinga2:/icinga2conf -v /storage/mysql:/mysql \
-    -e GRAPHITE_HOST=192.168.100.61:80 -e ICINGA_PASS="icinga" -e MAILSERVER="mail.example.com" \
+    -e NOTIFICATION_INTERVAL=0 -e GRAPHITE_HOST=192.168.100.61:80 -e ICINGA_PASS="icinga" -e MAILSERVER="mail.example.com" \
     -e EMAILADDR="user@example.com" -e NSCAPASS="pass" -e NSCAPORT="5667" \
     --name icinga2 -t adito/icinga2
     

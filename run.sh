@@ -128,6 +128,33 @@ else
 	ln -s /icingaweb2/groups.ini /etc/icingaweb2/groups.ini
 fi
 
+#Check if /icinga2conf folder exist
+if [[ ! -d /icinga2conf ]]; then
+	echo "folder /icinga2conf not exist. Exit"
+	exit 1
+fi
+
+#check if notifications.conf exist, if exist delete in /etc/icinga2
+if [[ -s /icinga2conf/notifications.conf ]]; then
+	rm /etc/icinga2/conf.d/notifications.conf
+else
+	mv /etc/icinga2/conf.d/notifications.conf /icinga2conf/notifications.conf
+	
+	interval=$(cat notifications.conf | grep interval | wc -l);
+	if [ "$interval" -eq 2 ];
+	then
+		echo "interval is set"
+	else
+		#Check if NOTIFICATION_INTERVAL is defined
+		if [ -z "$NOTIFICATION_INTERVAL" ]; then
+			echo "default"
+		else
+			sed -i "17i\interval = $NOTIFICATION_INTERVAL" /icinga2conf/notifications.conf
+			sed -i "26i\interval = $NOTIFICATION_INTERVAL" /icinga2conf/notifications.conf
+		fi
+	fi
+fi
+
 #check if AD Auth is enabled
 if [[ $ENABLE_AD_AUTH -eq "1" ]]; then
 	#Add AD Auth (resources.ini)
