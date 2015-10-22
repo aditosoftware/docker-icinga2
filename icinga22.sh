@@ -1,16 +1,11 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # Olaf Assmus
 # optimiert Ubuntu 14.04.02 LTS x64
 #
 # Version 1.2.0
 # 09.04.15
 
-#Check env
-if [ -z "$ICINGA_PASS" ]; then
-	export ICINGA_PASS="icinga"
-else
-	echo $ICINGA_PASS
-fi
+ICINGA_PASS="icinga"
 
 #Icinga-trusty i386 amd64
 apt-get update
@@ -34,11 +29,12 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get -q -y install mysql-server
 
 #disable innodb
-service mysql stop
 sed -i '34s/#.*/ignore-builtin-innodb/g' /etc/mysql/my.cnf
 sed -i '33s/#.*/default-storage-engine = myisam/g' /etc/mysql/my.cnf
 
 service mysql start
+
+#service mysql start
 mysqladmin -u root password root
 
 #Use Standard IDO Inst.
@@ -295,6 +291,7 @@ ln -s /usr/share/icingaweb2/modules/graphite/ /etc/icingaweb2/enabledModules/gra
 mkdir /etc/icingaweb2/modules/graphite
 touch /etc/icingaweb2/modules/graphite/config.ini
 echo "[graphite]" > /etc/icingaweb2/modules/graphite/config.ini
+echo "legacy_mode = true" >> /etc/icingaweb2/modules/graphite/config.ini
 echo 'metric_prefix = icinga' >> /etc/icingaweb2/modules/graphite/config.ini
 echo "base_url = http://graphite.host/render?" >> /etc/icingaweb2/modules/graphite/config.ini
 echo 'service_name_template = "$host.name$.$service.name$"' >> /etc/icingaweb2/modules/graphite/config.ini
@@ -306,5 +303,4 @@ echo 'graphite_args_template = "&target=$target$&source=0&width=300&height=120&h
 sed -i 's#command_file.*#command_file=/var/run/icinga2/cmd/icinga2.cmd#g' /etc/nsca.cfg
 
 graphite-manage syncdb --noinput
-service icinga2 restart
 unset DEBIAN_FRONTEND
