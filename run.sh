@@ -194,15 +194,13 @@ if [[ ! -s /icinga2conf/passive.conf ]]; then
 	#Icinga2 Passive Check template (Host and Service)
 	echo "template Service \"passive-service\" { " > /icinga2conf/passive.conf
 	echo "        max_check_attempts = 1" >> /icinga2conf/passive.conf
-	echo "        retry_interval = 1m " >> /icinga2conf/passive.conf
-	echo "        check_interval = 1m " >> /icinga2conf/passive.conf
+	echo "        #retry_interval = 1m " >> /icinga2conf/passive.conf
+	echo "        check_interval = 2m " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf
 	echo "        enable_active_checks = false " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf
-	echo "        check_command = \"dummy\" " >> /icinga2conf/passive.conf
+	echo "        check_command = \"passive\" " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf
-	echo "        vars.dummy_state = 2 " >> /icinga2conf/passive.conf
-	echo "        vars.dummy_text = \"No Passive Check Result Received.\" " >> /icinga2conf/passive.conf
 	echo "	vars.notification[\"mail\"] = { " >> /icinga2conf/passive.conf
 	echo "	groups = [ \"icingaadmins\" ] " >> /icinga2conf/passive.conf
 	echo "	} " >> /icinga2conf/passive.conf
@@ -210,15 +208,13 @@ if [[ ! -s /icinga2conf/passive.conf ]]; then
 	echo " " >> /icinga2conf/passive.conf
 	echo "template Host \"passive-host\" { " >> /icinga2conf/passive.conf
 	echo "        max_check_attempts = 1 " >> /icinga2conf/passive.conf
-	echo "        retry_interval = 1m " >> /icinga2conf/passive.conf
+	echo "        #retry_interval = 1m " >> /icinga2conf/passive.conf
 	echo "        check_interval = 2m " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf
 	echo "        enable_active_checks = false " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf
-	echo "        check_command = \"dummy\" " >> /icinga2conf/passive.conf
+	echo "        check_command = \"passive\" " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf
-	echo "        vars.dummy_state = 2 " >> /icinga2conf/passive.conf
-	echo "        vars.dummy_text = \"No Passive Check Result Received.\" " >> /icinga2conf/passive.conf
 	echo "	vars.notification[\"mail\"] = { " >> /icinga2conf/passive.conf
 	echo "	groups = [ \"icingaadmins\" ] " >> /icinga2conf/passive.conf
 	echo "	} " >> /icinga2conf/passive.conf
