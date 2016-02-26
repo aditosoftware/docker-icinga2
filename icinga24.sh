@@ -291,12 +291,10 @@ ln -s /usr/share/icingaweb2/modules/graphite/ /etc/icingaweb2/enabledModules/gra
 mkdir /etc/icingaweb2/modules/graphite
 touch /etc/icingaweb2/modules/graphite/config.ini
 echo "[graphite]" > /etc/icingaweb2/modules/graphite/config.ini
-echo "legacy_mode = true" >> /etc/icingaweb2/modules/graphite/config.ini
-echo 'metric_prefix = icinga' >> /etc/icingaweb2/modules/graphite/config.ini
+echo 'metric_prefix = icinga2' >> /etc/icingaweb2/modules/graphite/config.ini
 echo "base_url = http://graphite.host/render?" >> /etc/icingaweb2/modules/graphite/config.ini
-echo 'service_name_template = "$host.name$.$service.name$"' >> /etc/icingaweb2/modules/graphite/config.ini
-echo 'host_name_template = "$host.name$"' >> /etc/icingaweb2/modules/graphite/config.ini
-echo ';this template is used for the small image, macro $target$ can used.' >> /etc/icingaweb2/modules/graphite/config.ini
+echo 'service_name_template = "icinga2.$host.name$.services.$service.name$.$service.check_command$.perfdata.$metric$.value"' >> /etc/icingaweb2/modules/graphite/config.ini
+echo 'host_name_template = "icinga2.$host.name$.host.$host.check_command$.perfdata.$metric$.value"' >> /etc/icingaweb2/modules/graphite/config.ini
 echo 'graphite_args_template = "&target=$target$&source=0&width=300&height=120&hideAxes=true&lineWidth=2&hideLegend=true&colorList=049BAF"' >> /etc/icingaweb2/modules/graphite/config.ini
 
 #NSCA /var/run/icinga2/cmd/icinga2.cmd

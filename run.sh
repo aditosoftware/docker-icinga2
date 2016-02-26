@@ -74,7 +74,6 @@ if [ -z "$EMAILADDR" ]; then
 else
 	sed -i "11s/.*/enable_notifications = true/g" /etc/icinga2/conf.d/users.conf
 	sed -i 's/'"root@localhost"'/'"$EMAILADDR"'/' /etc/icinga2/conf.d/users.conf
-
 fi
 #check if NSCA Password is defined
 if [ -z "$NSCAPASS" ]; then
@@ -153,6 +152,31 @@ else
 			sed -i "26i\interval = $NOTIFICATION_INTERVAL" /icinga2conf/notifications.conf
 		fi
 	fi
+fi
+
+#Enable API
+icinga2 api setup
+
+#check apipass variable
+if [ -z "$APIUSER" ]; then
+	echo "API user not defined"
+	icinga2 feature disable api
+	rm -Rf /etc/icinga2/conf.d/api-users.conf
+else
+		if [[ -s /icinga2conf/api-users.conf ]]; then
+			rm /etc/icinga2/conf.d/api-users.conf
+		else
+			rm -Rf /etc/icinga2/conf.d/api-users.conf
+			echo "object ApiUser \"$APIUSER\" {" > /icinga2conf/api-users.conf
+			if [  -z "$APIPASS" ]; then
+				echo "Password not defined, set default \"icingaapi2012m\""
+				echo "password = \"icingaapi2012m\" " >> /icinga2conf/api-users.conf
+			else
+				echo "password = \"$APIPASS\" " >> /icinga2conf/api-users.conf
+			fi
+		echo " permissions = [ \"*\"]" >> /icinga2conf/api-users.conf
+		echo "}" >> /icinga2conf/api-users.conf
+	fi	
 fi
 
 #check if AD Auth is enabled

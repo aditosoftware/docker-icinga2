@@ -1,10 +1,10 @@
 FROM ubuntu
 
-COPY ./icinga22.sh /tmp/
-COPY ./run.sh /
+COPY icinga24.sh /tmp/icinga24.sh
+COPY run.sh /
 
-RUN chmod +x /tmp/icinga22.sh && chmod +x /run.sh
-RUN /tmp/icinga22.sh
+RUN chmod +x /tmp/icinga24.sh && chmod +x /run.sh
+RUN /tmp/icinga24.sh
 
 VOLUME ["/icinga2conf","/mysql","/icingaweb2"]
 
