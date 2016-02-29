@@ -7,6 +7,13 @@ MYSQLNEW="/mysql"
 #Change depricated mysql config
 sed -i 's/key_buffer*/key_buffer_size/g' /etc/mysql/my.cnf
 
+#Add pached libicinga.so file. Bug: https://dev.icinga.org/issues/11248
+if [[ -s /icinga2conf/libicinga.so ]]; then
+	mv /usr/lib/x86_64-linux-gnu/icinga2/libicinga.so /usr/lib/x86_64-linux-gnu/icinga2/libicinga.so_old
+	mv /icinga2conf/libicinga.so /usr/lib/x86_64-linux-gnu/icinga2/libicinga.so
+fi
+
+
 #Check folder /mysql. exit if not exist
 if [ ! -d "$MYSQLNEW" ]; then
 	echo "Folder $MYSQLNEW not found. Exit"
@@ -217,11 +224,11 @@ fi
 if [[ ! -s /icinga2conf/passive.conf ]]; then
 	#Icinga2 Passive Check template (Host and Service)
 	echo "template Service \"passive-service\" { " > /icinga2conf/passive.conf
-	echo "        max_check_attempts = 1" >> /icinga2conf/passive.conf
-	echo "        #retry_interval = 1m " >> /icinga2conf/passive.conf
-	echo "        check_interval = 2m " >> /icinga2conf/passive.conf
+	echo "        max_check_attempts = 2" >> /icinga2conf/passive.conf
+	echo "        check_interval = 3m " >> /icinga2conf/passive.conf
+	echo "        retry_interval = 0 " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf
-	echo "        enable_active_checks = false " >> /icinga2conf/passive.conf
+	echo "        enable_active_checks = true " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf
 	echo "        check_command = \"passive\" " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf
@@ -231,11 +238,11 @@ if [[ ! -s /icinga2conf/passive.conf ]]; then
 	echo "} " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf
 	echo "template Host \"passive-host\" { " >> /icinga2conf/passive.conf
-	echo "        max_check_attempts = 1 " >> /icinga2conf/passive.conf
-	echo "        #retry_interval = 1m " >> /icinga2conf/passive.conf
-	echo "        check_interval = 2m " >> /icinga2conf/passive.conf
+	echo "        max_check_attempts = 2 " >> /icinga2conf/passive.conf
+	echo "        check_interval = 3m " >> /icinga2conf/passive.conf
+	echo "        retry_interval = 0 " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf
-	echo "        enable_active_checks = false " >> /icinga2conf/passive.conf
+	echo "        enable_active_checks = true " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf
 	echo "        check_command = \"passive\" " >> /icinga2conf/passive.conf
 	echo " " >> /icinga2conf/passive.conf

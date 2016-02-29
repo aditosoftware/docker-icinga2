@@ -49,7 +49,7 @@ echo 'library "db_ido_mysql"' > /etc/icinga2/features-available/ido-mysql.conf
 echo 'object IdoMysqlConnection "ido-mysql" {' >> /etc/icinga2/features-available/ido-mysql.conf
 echo ' user = "root",' >> /etc/icinga2/features-available/ido-mysql.conf
 echo ' password = "root",' >> /etc/icinga2/features-available/ido-mysql.conf
-echo ' host = "localhost",' >> /etc/icinga2/features-available/ido-mysql.conf	
+echo ' host = "localhost",' >> /etc/icinga2/features-available/ido-mysql.conf
 echo ' database = "icinga2idomysql"' >> /etc/icinga2/features-available/ido-mysql.conf
 echo '} ' >> /etc/icinga2/features-available/ido-mysql.conf
 
@@ -67,7 +67,7 @@ apt-get install icinga2-classicui -y
 
 #Add User root to htpasswd.root. Pass root
 htpasswd -b /etc/icinga2-classicui/htpasswd.users icingaadmin $ICINGA_PASS
-	
+
 #Classic UI Installation
 #http://localhost/icinga2-classicui/
 #Login:icingaadmin
@@ -119,7 +119,7 @@ service apache2 reload
 
 #/usr/share/icingaweb2/bin/icingacli setup token create
 
-#It is required that a default timezone has been set using date.timezone in /etc/php5/apache2/php.ini. 
+#It is required that a default timezone has been set using date.timezone in /etc/php5/apache2/php.ini.
 #Change to date.timezone =Europe/Berlin
 echo "date.timezone =Europe/Berlin" >> /etc/php5/apache2/php.ini
 
