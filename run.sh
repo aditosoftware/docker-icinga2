@@ -10,7 +10,7 @@ sed -i 's/key_buffer*/key_buffer_size/g' /etc/mysql/my.cnf
 #Add pached libicinga.so file. Bug: https://dev.icinga.org/issues/11248
 if [[ -s /icinga2conf/libicinga.so ]]; then
 	mv /usr/lib/x86_64-linux-gnu/icinga2/libicinga.so /usr/lib/x86_64-linux-gnu/icinga2/libicinga.so_old
-	mv /icinga2conf/libicinga.so /usr/lib/x86_64-linux-gnu/icinga2/libicinga.so
+	cp /icinga2conf/libicinga.so /usr/lib/x86_64-linux-gnu/icinga2/libicinga.so
 fi
 
 
