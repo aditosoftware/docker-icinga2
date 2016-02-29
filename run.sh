@@ -1,8 +1,7 @@
 #!/bin/bash
-#set -e
 
 MYSQLOLD="/var/lib/mysql"
-MYSQLNEW="/mysql"
+MYSQLNEW="/mysql" 
 
 #Change depricated mysql config
 sed -i 's/key_buffer*/key_buffer_size/g' /etc/mysql/my.cnf
