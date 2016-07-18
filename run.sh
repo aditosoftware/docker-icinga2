@@ -3,9 +3,6 @@
 MYSQLOLD="/var/lib/mysql"
 MYSQLNEW="/mysql" 
 
-#Change depricated mysql config
-sed -i 's/key_buffer*/key_buffer_size/g' /etc/mysql/my.cnf
-
 #Add pached libicinga.so file. Bug: https://dev.icinga.org/issues/11248
 if [[ -s /icinga2conf/libicinga.so ]]; then
 	mv /usr/lib/x86_64-linux-gnu/icinga2/libicinga.so /usr/lib/x86_64-linux-gnu/icinga2/libicinga.so_old
@@ -25,9 +22,6 @@ else
 	
 	if [ ! -d "$MYSQLNEW/mysql" ]; then
 		cp -R $MYSQLOLD/mysql $MYSQLNEW
-	fi
-	if [ ! -d "$MYSQLNEW/graphite" ]; then
-		cp -R $MYSQLOLD/graphite $MYSQLNEW/
 	fi
 	if [ ! -d "$MYSQLNEW/icinga2idomysql" ]; then
 		cp -R $MYSQLOLD/icinga2idomysql $MYSQLNEW/
@@ -59,13 +53,7 @@ if [ -z "$ICINGA_PASS" ]; then
 else
 	echo $ICINGA_PASS
 fi
-#check graphitehost variable
-if [ -z "GRAPHITE_HOST" ]; then
-	echo "Graphite Host not defined.Exit"
-	exit 1
-else
-	echo $GRAPHITE_HOST
-fi
+
 #check mailserver variable
 if [ -z "MAILSERVER" ]; then
 	echo "Mailserver not defined"
@@ -163,26 +151,38 @@ fi
 #Enable API
 icinga2 api setup
 
-#check apipass variable
-if [ -z "$APIUSER" ]; then
-	echo "API user not defined"
-	icinga2 feature disable api
-	rm -Rf /etc/icinga2/conf.d/api-users.conf
+if [[ -n $API_ENABLE ]]; then
+  echo "Enabling Icinga 2 API."
+  rm -f /etc/icinga2/features-enabled/api.conf
+  rm -f /etc/icinga2/conf.d/api-users.conf
+  
+  cat <<EOF >/icinga2conf/api.conf
+object ApiUser "$APIUSER" {
+password = "$APIPASS"
+ permissions = [ "*"]
+}
+EOF
 else
-		if [[ -s /icinga2conf/api-users.conf ]]; then
-			rm /etc/icinga2/conf.d/api-users.conf
-		else
-			rm -Rf /etc/icinga2/conf.d/api-users.conf
-			echo "object ApiUser \"$APIUSER\" {" > /icinga2conf/api-users.conf
-			if [  -z "$APIPASS" ]; then
-				echo "Password not defined, set default \"icingaapi2012m\""
-				echo "password = \"icingaapi2012m\" " >> /icinga2conf/api-users.conf
-			else
-				echo "password = \"$APIPASS\" " >> /icinga2conf/api-users.conf
-			fi
-		echo " permissions = [ \"*\"]" >> /icinga2conf/api-users.conf
-		echo "}" >> /icinga2conf/api-users.conf
-	fi	
+	icinga2 feature disable api
+	service icinga2 reload
+fi
+
+#Enable Graphite Modul
+if [[ -n $ICINGA2_FEATURE_GRAPHITE ]]; then
+  echo "Enabling Icinga 2 Graphite feature."
+  icinga2 feature enable graphite
+
+cat <<EOF >/etc/icinga2/features-enabled/graphite.conf
+/**
+ * The GraphiteWriter type writes check result metrics and
+ * performance data to a graphite tcp socket.
+ */
+library "perfdata"
+object GraphiteWriter "graphite" {
+  host = "$GRAPHITE_HOST"
+  port = "$GRAPHITE_PORT"
+}
+EOF
 fi
 
 #check if AD Auth is enabled
@@ -270,6 +270,5 @@ sed -i "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
 #Restart service
 service apache2 restart
 service icinga2 restart
-service carbon-cache restart
 
 exec nsca -c /etc/nsca.cfg -f --daemon
