@@ -54,7 +54,6 @@ echo ' database = "icinga2idomysql"' >> /etc/icinga2/features-available/ido-mysq
 echo '} ' >> /etc/icinga2/features-available/ido-mysql.conf
 
 icinga2 feature enable ido-mysql
-mkdir -p /icinga2conf
 /etc/init.d/icinga2 restart
 
 #In order for queries and commands to work you will need to add your query user (e.g. your web server) to the icingacmd group
@@ -67,8 +66,7 @@ service icinga2 restart
 apt-get install icinga2-classicui -y
 
 #Add User root to htpasswd.root. Pass root
-htpasswd -cb /icinga2conf/htpasswd.users icingaadmin $ICINGA_PASS
-ln -s /icinga2conf/htpasswd.users /etc/icinga2-classicui/htpasswd.users
+htpasswd -b /etc/icinga2-classicui/htpasswd.users icingaadmin $ICINGA_PASS
 
 #Classic UI Installation
 #http://localhost/icinga2-classicui/
@@ -78,6 +76,7 @@ ln -s /icinga2conf/htpasswd.users /etc/icinga2-classicui/htpasswd.users
 #---------------------------------------------------------------------------------------------------
 #Icinga Web 2 installation
 apt-get install make apache2 git zend-framework libapache2-mod-php php-mcrypt apache2-utils php-mysql php-ldap -y
+service apache2 restart
 #Fehler "AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 127.0.1.1." unterdrücken
 echo "ServerName localhost" >> /etc/apache2/apache2.conf
 
@@ -91,7 +90,7 @@ echo "include_path = ".:/usr/share/php:/usr/share/php/libzend-framework-php/"" >
 
 #IcingaWeb2 Git Download
 cd /usr/src/
-git clone https://github.com/Icinga/icingaweb2.git
+git clone http://git.icinga.org/icingaweb2.git
 
 #Anlegen der IcingaWeb2 mysql Datenbank
 echo > ~/icingaweb2db.sql
@@ -118,6 +117,8 @@ service apache2 reload
 
 /usr/share/icingaweb2/bin/icingacli setup config directory
 
+#/usr/share/icingaweb2/bin/icingacli setup token create
+
 #It is required that a default timezone has been set using date.timezone in /etc/php5/apache2/php.ini.
 #Change to date.timezone =Europe/Berlin
 echo "date.timezone =Europe/Berlin" >> /etc/php/7.0/apache2/php.ini
@@ -142,9 +143,9 @@ echo '[global]' > /etc/icingaweb2/config.ini
 echo 'show_stacktraces = "1"' >> /etc/icingaweb2/config.ini
 echo 'config_backend = "db"' >> /etc/icingaweb2/config.ini
 echo 'config_resource = "icingaweb_db"' >> /etc/icingaweb2/config.ini
-echo '[logging] ' >> /etc/icingaweb2/config.ini
-echo 'log = "syslog" ' >> /etc/icingaweb2/config.ini
-echo 'level = "ERROR" ' >> /etc/icingaweb2/config.ini
+echo '[logging] >>' /etc/icingaweb2/config.ini
+echo 'log = "syslog" >>' /etc/icingaweb2/config.ini
+echo 'level = "ERROR" >>' /etc/icingaweb2/config.ini
 echo 'application = "icingaweb2"' >> /etc/icingaweb2/config.ini
 
 #groups.ini
@@ -201,11 +202,78 @@ echo 'protected_customvars = "*pw*,*pass*,community"' >> /etc/icingaweb2/modules
 ln -s /usr/share/icingaweb2/modules/monitoring/ /etc/icingaweb2/enabledModules/monitoring
 ln -s /usr/share/icingaweb2/modules/iframe/ /etc/icingaweb2/enabledModules/iframe
 
-###################################################### Icinga2 Graphite Modul Installation ######################################################
+###################################################### Graphite und Icinga2 Graphite Modul Installation ######################################################
+
+#apt-get install graphite-carbon graphite-web libapache2-mod-wsgi-py3  -y
+apt-get install build-essential graphite-web graphite-carbon python-dev libapache2-mod-wsgi python-pymysql python-mysqldb -y
+
+#Anlegen der Graphite mysql Datenbank
+echo > ~/graphite.sql
+echo "CREATE DATABASE graphite;" >> ~/graphite.sql
+#Passwort bei Bedarf bitte ändern
+echo "CREATE USER 'graphite'@'localhost' IDENTIFIED BY 'complexpassw0rd';" >> ~/graphite.sql
+#############
+echo "GRANT ALL PRIVILEGES ON graphite.* TO 'graphite'@'localhost';" >> ~/graphite.sql
+echo "FLUSH PRIVILEGES;" >> ~/graphite.sql
+mysql -u root -proot < ~/graphite.sql
+
+
+echo "CARBON_CACHE_ENABLED=true" > /etc/default/graphite-carbon
+service carbon-cache start
+
+cp /usr/share/graphite-web/apache2-graphite.conf /etc/apache2/sites-available/graphite.conf
+rm /etc/apache2/sites-enabled/000-default.conf
+
+#Apache 2.4 Anpassungen vornehmen
+#		<Directory /usr/share/graphite-web/>
+#                Require all granted
+#		</Directory>
+sed -i '3i<Directory /usr/share/graphite-web/>' /etc/apache2/sites-available/graphite.conf
+sed -i '4iRequire all granted' /etc/apache2/sites-available/graphite.conf
+sed -i '5i</Directory>' /etc/apache2/sites-available/graphite.conf
+
+a2ensite graphite
+
+service apache2 restart
 
 #Enable Graphite feature
 icinga2 feature enable graphite
 /etc/init.d/icinga2 restart
+
+#Configure graphite to use the MySQL database within the etc/graphite/local_settings.py config file.
+#Change From:
+#DATABASES = {
+#    'default': {
+#        'NAME': '/var/lib/graphite/graphite.db',
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'USER': '',
+#        'PASSWORD': '',
+#        'HOST': '',
+#        'PORT': ''
+#    }
+#}
+#To
+#
+#DATABASES = {
+#  'default': {
+#    'NAME': 'graphite',
+#    'ENGINE': 'django.db.backends.mysql',
+#    'USER': 'graphite',
+#    'PASSWORD': 'complexpassw0rd',
+#    'HOST': 'localhost',
+#    'PORT': '3306',
+#  }
+#}
+
+sed -i 's/'NAME'.*/NAME'\'': '\''graphite'\'',/g' /etc/graphite/local_settings.py
+sed -i 's/'NAME'.*/NAME'\'': '\''graphite'\'',/g' /etc/graphite/local_settings.py
+sed -i 's/'ENGINE'.*/ENGINE'\'': '\''django.db.backends.mysql'\'',/g' /etc/graphite/local_settings.py
+sed -i 's/'USER'.*/USER'\'': '\''root'\'',/g' /etc/graphite/local_settings.py
+#Passwort bei Bedarf bitte ändern
+sed -i 's/'PASSWORD'.*/PASSWORD'\'': '\''root'\'',/g' /etc/graphite/local_settings.py
+###################
+sed -i 's/'HOST'.*/HOST'\'': '\''localhost'\'',/g' /etc/graphite/local_settings.py
+sed -i 's/'PORT'.*/PORT'\'': '\''3306'\'',/g' /etc/graphite/local_settings.py
 
 #Install Graphite Icinga2 Modul
 cd /usr/share/icingaweb2/modules
@@ -233,14 +301,10 @@ echo 'graphite_args_template = "&target=$target$&source=0&width=300&height=120&h
 #NSCA /var/run/icinga2/cmd/icinga2.cmd
 sed -i 's#command_file.*#command_file=/var/run/icinga2/cmd/icinga2.cmd#g' /etc/nsca.cfg
 
-#Create Redirecto to /icingaweb2
-rm /var/www/html/index.html
-cat <<EOF >/var/www/html/index.php
-<?php
-/* Redirect browser */
-header("Location: /icingaweb2/");
-exit;
-?>
-EOF
-
+graphite-manage migrate
+graphite-manage migrate auth
 unset DEBIAN_FRONTEND
+
+#Change icingaweb2 config
+#echo '<VirtualHost *:80>' | cat - /etc/apache2/conf-enabled/icingaweb2.conf > /tmp/temp && mv /tmp/temp /etc/apache2/conf-enabled/icingaweb2.conf
+#echo '</VirtualHost>' >> /etc/apache2/conf-enabled/icingaweb2.conf
