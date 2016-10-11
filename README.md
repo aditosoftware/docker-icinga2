@@ -6,10 +6,13 @@ This is a Docker container with Icinga2 (Icingaweb2 and Icinag2-Classicui).
 
 1. Update to v2.5
 2. Now with Ubutu 16.04
+3. Add supervisor service
 
 ### Ports
 
-Icinga running on port **80** (redirect to host/icingaweb2)
+Icinga2 running on port **80** (redirect to host/icingaweb2)
+Icinga2 API on port **5665** (don't forgot to set user and password)
+Icinga2 NSCA on port **5667** (for receive passive checks)
 Graphite running on port **8080**
 
 ## Variables
@@ -88,7 +91,7 @@ Graphite running on port **8080**
     
 ## Example
   
-    sudo docker run -d -p 80:80 -p 5667:5667 -p 8080:8080 -h monitoring.example.com \
+    sudo docker run -d -p 80:80 -p 5667:5667 -p 5665:5665 -p 8080:8080 -h monitoring.example.com \
     -v /storage/icingaweb2:/icingaweb2 -v /storage/icinga2:/icinga2conf -v /storage/mysql:/mysql \
     -e ENABLE_AD_AUTH="1" -e AD_NAME="example.com" -e AD_ROOT_DN="OU=accounts,OU=intern,DC=example,DC=com" \
     -e AD_BIND_DN="CN=Icinga2 Auth,OU=accounts,OU=intern,DC=example,DC=com" -e AD_BIND_PW="PASSWORDHERE" \
@@ -98,7 +101,7 @@ Graphite running on port **8080**
 
 ## Example 2 (without AD)
 
-    sudo docker run -i -p 80:80 -p 5667:5667 -p 8080:8080 -h monitoring.example.com \
+    sudo docker run -i -p 80:80 -p 5667:5667 -p 5665:5665 -p 8080:8080 -h monitoring.example.com \
     -v /storage/icingaweb2:/icingaweb2 -v /storage/icinga2:/icinga2conf -v /storage/mysql:/mysql \
     -v /storage/graphite:/var/lib/graphite/whisper \
     -e NOTIFICATION_INTERVAL=0 -e GRAPHITE_HOST=192.168.42.64:8080 \

@@ -281,8 +281,14 @@ sed -i "s#base.*#base_url=http://$GRAPHITE_HOST/render?#" /etc/icingaweb2/module
 sed -i "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
 
 #Restart service
-service apache2 restart
+service apache2 stop
+service nsca stop
+/etc/init.d/supervisor stop
 service icinga2 restart
 service carbon-cache restart
 
-exec nsca -c /etc/nsca.cfg -f --daemon
+rm /etc/init.d/apache2
+rm /etc/init.d/nsca
+rm /etc/init.d/supervisor
+
+supervisord -n -c /etc/supervisor/supervisord.conf

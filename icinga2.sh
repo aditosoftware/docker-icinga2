@@ -9,7 +9,7 @@ ICINGA_PASS="icinga"
 
 #Icinga-trusty i386 amd64
 apt-get update
-apt-get install python-software-properties software-properties-common apache2 vim heirloom-mailx nsca -y
+apt-get install python-software-properties software-properties-common apache2 vim heirloom-mailx nsca supervisor -y
 add-apt-repository ppa:formorer/icinga -y
 
 # Patchen des Systems
@@ -304,7 +304,3 @@ sed -i 's#command_file.*#command_file=/var/run/icinga2/cmd/icinga2.cmd#g' /etc/n
 graphite-manage migrate
 graphite-manage migrate auth
 unset DEBIAN_FRONTEND
-
-#Change icingaweb2 config
-#echo '<VirtualHost *:80>' | cat - /etc/apache2/conf-enabled/icingaweb2.conf > /tmp/temp && mv /tmp/temp /etc/apache2/conf-enabled/icingaweb2.conf
-#echo '</VirtualHost>' >> /etc/apache2/conf-enabled/icingaweb2.conf
