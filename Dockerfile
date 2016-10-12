@@ -2,7 +2,6 @@ FROM ubuntu
 
 COPY icinga2.sh /tmp/icinga2.sh
 COPY run.sh /
-COPY nsca.conf /etc/supervisor/conf.d/nsca.conf
 COPY apache2_supervisor.conf /etc/supervisor/conf.d/apache2.conf
 
 RUN chmod +x /tmp/icinga2.sh && chmod +x /run.sh

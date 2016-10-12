@@ -93,18 +93,6 @@ else
 	sed -i "11s/.*/enable_notifications = true/g" /etc/icinga2/conf.d/users.conf
 	sed -i 's/'"root@localhost"'/'"$EMAILADDR"'/' /etc/icinga2/conf.d/users.conf
 fi
-#check if NSCA Password is defined
-if [ -z "$NSCAPASS" ]; then
-	echo "nsca password not defined"
-else
-	echo "password=$NSCAPASS" >> /etc/nsca.cfg
-fi
-#check if NSCA Port ist defined. If not define set stardardport 5667
-if [ -z "$NSCAPORT" ]; then
-	sed -i "s/server_port.*/server_port=5667/g" /etc/nsca.cfg
-else
-	sed -i "s/server_port.*/server_port=$NSCAPORT/g" /etc/nsca.cfg
-fi
 
 #Check if /icingaweb2 folder exist
 if [[ ! -d /icingaweb2 ]]; then
@@ -282,13 +270,11 @@ sed -i "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
 
 #Restart service
 service apache2 stop
-service nsca stop
 /etc/init.d/supervisor stop
 service icinga2 restart
 service carbon-cache restart
 
 rm /etc/init.d/apache2
-rm /etc/init.d/nsca
 rm /etc/init.d/supervisor
 
 supervisord -n -c /etc/supervisor/supervisord.conf

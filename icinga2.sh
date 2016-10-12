@@ -9,7 +9,7 @@ ICINGA_PASS="icinga"
 
 #Icinga-trusty i386 amd64
 apt-get update
-apt-get install python-software-properties software-properties-common apache2 vim heirloom-mailx nsca supervisor -y
+apt-get install python-software-properties software-properties-common apache2 vim heirloom-mailx supervisor -y
 add-apt-repository ppa:formorer/icinga -y
 
 # Patchen des Systems
@@ -297,9 +297,6 @@ echo "base_url = http://graphite.host/render?" >> /etc/icingaweb2/modules/graphi
 echo 'service_name_template = "icinga2.$host.name$.services.$service.name$.$service.check_command$.perfdata.$metric$.value"' >> /etc/icingaweb2/modules/graphite/config.ini
 echo 'host_name_template = "icinga2.$host.name$.host.$host.check_command$.perfdata.$metric$.value"' >> /etc/icingaweb2/modules/graphite/config.ini
 echo 'graphite_args_template = "&target=$target$&source=0&width=300&height=120&hideAxes=true&lineWidth=2&hideLegend=true&colorList=049BAF"' >> /etc/icingaweb2/modules/graphite/config.ini
-
-#NSCA /var/run/icinga2/cmd/icinga2.cmd
-sed -i 's#command_file.*#command_file=/var/run/icinga2/cmd/icinga2.cmd#g' /etc/nsca.cfg
 
 graphite-manage migrate
 graphite-manage migrate auth
