@@ -9,6 +9,6 @@ RUN /tmp/icinga2.sh
 
 VOLUME ["/icinga2conf","/mysql","/icingaweb2"]
 
-EXPOSE 80 8080 5667 5665
+EXPOSE 80 8080 5665
 
 CMD ["/run.sh"]
