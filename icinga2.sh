@@ -10,12 +10,6 @@ ICINGA_PASS="icinga"
 #Icinga-trusty i386 amd64
 apt-get update
 apt-get install python-software-properties software-properties-common apache2 vim heirloom-mailx supervisor -y
-#add-apt-repository ppa:formorer/icinga -y
-
-# Patchen des Systems
-
-#apt-get update
-#apt-get upgrade -y
 
 # Installation icinga2
 apt-get install icinga2 -y
