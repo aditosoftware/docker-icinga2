@@ -298,6 +298,8 @@ echo 'service_name_template = "icinga2.$host.name$.services.$service.name$.$serv
 echo 'host_name_template = "icinga2.$host.name$.host.$host.check_command$.perfdata.$metric$.value"' >> /etc/icingaweb2/modules/graphite/config.ini
 echo 'graphite_args_template = "&target=$target$&source=0&width=300&height=120&hideAxes=true&lineWidth=2&hideLegend=true&colorList=049BAF"' >> /etc/icingaweb2/modules/graphite/config.ini
 
+echo "TIME_ZONE = 'Europe/Berlin'" >> /etc/graphite/local_settings.py
+
 graphite-manage migrate
 graphite-manage migrate auth
 unset DEBIAN_FRONTEND
