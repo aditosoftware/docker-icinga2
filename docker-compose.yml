@@ -1,0 +1,36 @@
+icinga2:
+  image: adito/icinga2:2.4
+  hostname: monitoring.adito.de
+  ports:
+    - "80:80"
+    - "5667:5667"
+    - "5665:5665"
+    - "8080:8080"
+  environment:
+    - GRAPHITE_HOST=192.168.42.51:8080
+    - ICINGA_PASS=icinga
+    - MAILSERVER=mail.adito.de
+    - EMAILADDR=email@adito.de
+    - NSCAPASS=pass
+    - NSCAPORT=5667
+    - NOTIFICATION_INTERVAL=0
+    - APIUSER=root
+    - APIPASS=pass
+  volumes:
+    - /etc/localtime:/etc/localtime:ro
+    - /etc/timezone:/etc/timezone:ro
+    - /a/data/monitoring/icingaweb2:/icingaweb2
+    - /a/data/monitoring/icinga2:/icinga2conf
+    - /a/data/monitoring/mysql:/mysql
+    - /a/data/monitoring/graphite:/var/lib/graphite/whisper
+  dns:
+    - 8.8.8.8
+    - 192.168.10.10
+  restart: always
+  labels:
+    nextfullbackup: "1M"
+    noffullbackup: "1"
+    backup: "/a/data/monitoring"
+    exclude: '["mysql"]'
+    strategy: "off"
+  restart: always
