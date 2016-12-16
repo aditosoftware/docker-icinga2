@@ -4,7 +4,7 @@ This is a Docker container with Icinga2 (Icingaweb2 and Icinag2-Classicui).
 
 ### Update
 
-1. Update to v2.5
+1. Update to v2.6
 2. Now with Ubutu 16.04
 3. Add supervisor service
 
