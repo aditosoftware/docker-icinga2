@@ -29,8 +29,9 @@ export DEBIAN_FRONTEND=noninteractive
 apt-get -q -y install mysql-server
 
 #disable innodb
-sed -i '34s/#.*/ignore-builtin-innodb/g' /etc/mysql/my.cnf
-sed -i '33s/#.*/default-storage-engine = myisam/g' /etc/mysql/my.cnf
+touch /etc/mysql/conf.d/icinga2.cnf
+echo "[mysqld]" > /etc/mysql/conf.d/icinga2.cnf
+echo 'sql-mode="NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"' >>  /etc/mysql/conf.d/icinga2.cnf
 
 service mysql start
 

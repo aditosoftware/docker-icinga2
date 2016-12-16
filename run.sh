@@ -3,9 +3,7 @@
 
 MYSQLOLD="/var/lib/mysql"
 MYSQLNEW="/mysql"
-
-#Change depricated mysql config
-sed -i 's/key_buffer*/key_buffer_size/g' /etc/mysql/my.cnf
+MYSQLCONF="/mysql.conf.d/mysqld.cnf"
 
 #Check folder /mysql. exit if not exist
 if [ ! -d "$MYSQLNEW" ]; then
@@ -31,7 +29,7 @@ else
 	fi
 	
 	#Change default path for mysql 
-	sed -i "s#datadir.*#datadir = /mysql#g" /etc/mysql/my.cnf
+	sed -i "s#datadir.*#datadir = /mysql#g" $MYSQLCONF
 	
 	#Start MYSQL
 	service mysql restart
