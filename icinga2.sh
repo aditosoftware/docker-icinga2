@@ -218,6 +218,20 @@ echo "GRANT ALL PRIVILEGES ON graphite.* TO 'graphite'@'localhost';" >> ~/graphi
 echo "FLUSH PRIVILEGES;" >> ~/graphite.sql
 mysql -u root -proot < ~/graphite.sql
 
+rm -Rf /etc/carbon/storage-schemas.conf
+cat > /etc/carbon/storage-schemas.conf << EOF
+[carbon]
+pattern = ^carbon\.
+retentions = 60:90d
+
+[icinga2_default]
+pattern = ^icinga2\.
+retentions = 10s:2d,2m:10d,15m:90d,30m:4y
+
+[default_1min_for_1day]
+pattern = .*
+retentions = 30s:7d,5m:30d,10m:2y
+EOF
 
 echo "CARBON_CACHE_ENABLED=true" > /etc/default/graphite-carbon
 service carbon-cache start
