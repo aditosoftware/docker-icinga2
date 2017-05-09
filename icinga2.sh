@@ -91,7 +91,7 @@ echo "include_path = ".:/usr/share/php:/usr/share/php/libzend-framework-php/"" >
 
 #IcingaWeb2 Git Download
 cd /usr/src/
-git clone http://git.icinga.org/icingaweb2.git
+git clone https://github.com/Icinga/icingaweb2.git
 
 #Anlegen der IcingaWeb2 mysql Datenbank
 echo > ~/icingaweb2db.sql
