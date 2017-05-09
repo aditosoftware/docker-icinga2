@@ -278,6 +278,9 @@ sed -i "s#base.*#base_url=http://$GRAPHITE_HOST/render?#" /etc/icingaweb2/module
 #Change permissions icingaweb2 and icinga2 custom configuration folder
 sed -i "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
 
+#Change timezone for graphite to Europe/Berlin
+echo "TIME_ZONE = 'Europe/Berlin'" >> /etc/graphite/local_settings.py
+
 #Restart service
 service apache2 stop
 service nsca stop
