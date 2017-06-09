@@ -230,7 +230,7 @@ retentions = 10s:2d,2m:10d,15m:90d,30m:4y
 
 [default_1min_for_1day]
 pattern = .*
-retentions = 30s:7d,5m:30d,10m:2y
+retentions = 10s:2d,2m:10d,15m:90d,30m:4y
 EOF
 
 echo "CARBON_CACHE_ENABLED=true" > /etc/default/graphite-carbon
