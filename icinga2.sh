@@ -101,6 +101,7 @@ echo "GRANT ALL PRIVILEGES ON icingaweb.* TO icingaweb@localhost;" >> ~/icingawe
 echo "FLUSH PRIVILEGES;" >> ~/icingaweb2db.sql
 
 mysql -u root -proot < ~/icingaweb2db.sql
+rm -Rf ~/icingaweb2db.sql
 
 #Schema import
 echo Schema import /icingaweb2/etc/schema/mysql.schema.sql

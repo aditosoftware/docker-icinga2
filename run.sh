@@ -3,43 +3,56 @@
 
 MYSQLOLD="/var/lib/mysql"
 MYSQLNEW="/mysql"
-MYSQLCONF="/mysql.conf.d/mysqld.cnf"
+MYSQLCONF="/etc/mysql/mysql.conf.d/mysqld.cnf"
+
+echo "$MYSQLOLD" > /output.log
+echo "$MYSQLNEW" >> /output.log
 
 #Check folder /mysql. exit if not exist
 if [ ! -d "$MYSQLNEW" ]; then
+	echo "Folder $MYSQLNEW not found. Exit" >> output.log
 	echo "Folder $MYSQLNEW not found. Exit"
 	exit 1
 else
-	cp -R $MYSQLOLD /
-	
-	#Change permissions icingaweb2 and icinga2 custom configuration folder
-	chown mysql:mysql -R $MYSQLNEW
-	
-	if [ ! -d "$MYSQLNEW/mysql" ]; then
-		cp -R $MYSQLOLD/mysql $MYSQLNEW
-	fi
-	if [ ! -d "$MYSQLNEW/graphite" ]; then
-		cp -R $MYSQLOLD/graphite $MYSQLNEW/
-	fi
-	if [ ! -d "$MYSQLNEW/icinga2idomysql" ]; then
-		cp -R $MYSQLOLD/icinga2idomysql $MYSQLNEW/
-	fi
-	if [ ! -d "$MYSQLNEW/icingaweb" ]; then
-		cp -R $MYSQLOLD/icingaweb $MYSQLNEW/
-	fi
-	
-	#Change default path for mysql 
+	cp -Rn $MYSQLOLD /
+	echo "Copy $MYSQLOLD to /" >> output.log
+
+	echo "Set permissions of $MYSQLNEW" >> output.log
+
+#	if [ ! -d "$MYSQLNEW/mysql" ]; then
+#		echo "copy $MYSQLOLD/mysql $MYSQLNEW" >> output.log
+#		cp -R $MYSQLOLD/mysql $MYSQLNEW
+#	fi
+#	if [ ! -d "$MYSQLNEW/graphite" ]; then
+#		echo "copy $MYSQLOLD/graphite $MYSQLNEW/" >> output.log
+#		cp -R $MYSQLOLD/graphite $MYSQLNEW/
+#	fi
+#	if [ ! -d "$MYSQLNEW/icinga2idomysql" ]; then
+#		echo "copy $MYSQLOLD/icinga2idomysql $MYSQLNEW/" >> output.log
+#		cp -R $MYSQLOLD/icinga2idomysql $MYSQLNEW/
+#	fi
+#	if [ ! -d "$MYSQLNEW/icingaweb" ]; then
+#		echo "copy $MYSQLOLD/icingaweb $MYSQLNEW/" >> output.log
+#		cp -R $MYSQLOLD/icingaweb $MYSQLNEW/
+#	fi
+
+	#Change default path for mysql
 	sed -i "s#datadir.*#datadir = /mysql#g" $MYSQLCONF
-	
+
+	#Change permissions icingaweb2 and icinga2 custom configuration folder
+	echo "Change permissions of $MYSQLNEW to mysql:mysql" >> output.log
+	chown mysql:mysql -R $MYSQLNEW
+
 	#Start MYSQL
 	service mysql restart
-	
+
 	UP=$(ps aux | grep mysql | wc -l);
 	if [ "$UP" -ne 2 ];
 	then
 		service mysql restart
 	else
 		echo "cannot start mysql service"
+		exit 1
 	fi
 fi
 
@@ -154,7 +167,7 @@ if [[ -s /icinga2conf/notifications.conf ]]; then
 	rm /etc/icinga2/conf.d/notifications.conf
 else
 	mv /etc/icinga2/conf.d/notifications.conf /icinga2conf/notifications.conf
-	
+
 	interval=$(cat notifications.conf | grep interval | wc -l);
 	if [ "$interval" -eq 2 ];
 	then
@@ -193,7 +206,7 @@ else
 			fi
 		echo " permissions = [ \"*\"]" >> /icinga2conf/api-users.conf
 		echo "}" >> /icinga2conf/api-users.conf
-	fi	
+	fi
 fi
 
 #check if AD Auth is enabled
@@ -206,11 +219,11 @@ if [[ $ENABLE_AD_AUTH -eq "1" ]]; then
 	echo "root_dn         = \"$AD_ROOT_DN\"" >> /icingaweb2/resources.ini
 	echo "bind_dn         = \"$AD_BIND_DN\"" >> /icingaweb2/resources.ini
 	echo "bind_pw         = \"$AD_BIND_PW\"" >> /icingaweb2/resources.ini
-	
+
 	echo "[AD]" >> /icingaweb2/authentication.ini
 	echo "resource = \"ad\" " >> /icingaweb2/authentication.ini
 	echo "backend = \"msldap\" " >> /icingaweb2/authentication.ini
-	
+
 	echo "[ad]" >> /icingaweb2/resources.ini
 	echo " type            = \"ldap\"" >> /icingaweb2/resources.ini
 	echo "hostname        = \"$AD_NAME\"" >> /icingaweb2/resources.ini
@@ -267,10 +280,8 @@ htpasswd -b /etc/icinga2-classicui/htpasswd.users icingaadmin $ICINGA_PASS
 #Generate password hash for icingaweb user (http://server.local/icinga2-classicui)
 pass=$(openssl passwd -1 $ICINGA_PASS)
 
-#Update Icingaweb2 user password
-echo "update icingaweb_user set password_hash='$pass' where name='icingaadmin';" >> ~/userupdate.sql
-mysql -u root -proot icingaweb < ~/userupdate.sql
-rm -f ~/userupdate.sql
+mysql -uroot -proot icingaweb -e "update icingaweb_user set password_hash='$pass' where name='icingaadmin';"
+echo "configure icingaweb user $pass" >> output.log
 
 #Change Graphite host
 sed -i "s#base.*#base_url=http://$GRAPHITE_HOST/render?#" /etc/icingaweb2/modules/graphite/config.ini
