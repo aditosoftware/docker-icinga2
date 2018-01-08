@@ -284,7 +284,7 @@ mysql -uroot -proot icingaweb -e "update icingaweb_user set password_hash='$pass
 echo "configure icingaweb user $pass" >> output.log
 
 #Change Graphite host
-sed -i "s#base.*#base_url=http://$GRAPHITE_HOST/render?#" /etc/icingaweb2/modules/graphite/config.ini
+sed -i "s#base.*#base_url=$GRAPHITE_HOST/render?#" /etc/icingaweb2/modules/graphite/config.ini
 
 #Change permissions icingaweb2 and icinga2 custom configuration folder
 sed -i "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
