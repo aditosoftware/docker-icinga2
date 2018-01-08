@@ -296,8 +296,11 @@ echo "TIME_ZONE = 'Europe/Berlin'" >> /etc/graphite/local_settings.py
 service apache2 stop
 service nsca stop
 /etc/init.d/supervisor stop
-service icinga2 restart
 service carbon-cache restart
+
+#enable api again
+icinga2 setup api
+service icinga2 restart
 
 rm /etc/init.d/apache2
 rm /etc/init.d/nsca
