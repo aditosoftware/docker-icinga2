@@ -299,7 +299,7 @@ service nsca stop
 service carbon-cache restart
 
 #enable api again
-icinga2 setup api
+icinga2 feature enable api
 service icinga2 restart
 
 rm /etc/init.d/apache2
