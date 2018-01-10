@@ -10,7 +10,9 @@ ICINGA_PASS="icinga"
 #Icinga-trusty i386 amd64
 apt-get update
 apt-get install python-software-properties software-properties-common apache2 vim heirloom-mailx nsca supervisor -y
-add-apt-repository ppa:formorer/icinga -y
+wget -O - http://packages.icinga.org/icinga.key | apt-key add -
+echo 'deb http://packages.icinga.org/ubuntu icinga-xenial main' > /etc/apt/sources.list.d/icinga-main-xenial.list
+
 
 # Patchen des Systems
 
