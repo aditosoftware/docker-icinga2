@@ -1,4 +1,4 @@
-FROM ubuntu
+FROM ubuntu:16.04
 
 COPY icinga2.sh /tmp/icinga2.sh
 COPY run.sh /

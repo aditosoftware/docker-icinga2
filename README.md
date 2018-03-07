@@ -4,7 +4,7 @@ This is a Docker container with Icinga2 (Icingaweb2 and Icinag2-Classicui).
 
 ### Update
 
-1. Update to v2.6
+1. Update to icinga2 v2.8.1-1 and icingaweb2 2.5.1
 2. Now with Ubutu 16.04
 3. Add supervisor service
 
@@ -95,7 +95,7 @@ Graphite running on port **8080**
     -v /storage/icingaweb2:/icingaweb2 -v /storage/icinga2:/icinga2conf -v /storage/mysql:/mysql \
     -e ENABLE_AD_AUTH="1" -e AD_NAME="example.com" -e AD_ROOT_DN="OU=accounts,OU=intern,DC=example,DC=com" \
     -e AD_BIND_DN="CN=Icinga2 Auth,OU=accounts,OU=intern,DC=example,DC=com" -e AD_BIND_PW="PASSWORDHERE" \
-    -e NOTIFICATION_INTERVAL=0 -e GRAPHITE_HOST=192.168.100.61:8080 -e ICINGA_PASS="icinga" -e MAILSERVER="mail.example.com" \
+    -e NOTIFICATION_INTERVAL=0 -e GRAPHITE_HOST=http://192.168.100.61:8080 -e ICINGA_PASS="icinga" -e MAILSERVER="mail.example.com" \
     -e EMAILADDR="user@example.com" -e NSCAPASS="pass" -e NSCAPORT="5667" -e APIUSER=root -e APIPASS=pass \
     --name icinga2 -t adito/icinga2
 
@@ -104,7 +104,7 @@ Graphite running on port **8080**
     sudo docker run -i -p 80:80 -p 5667:5667 -p 5665:5665 -p 8080:8080 -h monitoring.example.com \
     -v /storage/icingaweb2:/icingaweb2 -v /storage/icinga2:/icinga2conf -v /storage/mysql:/mysql \
     -v /storage/graphite:/var/lib/graphite/whisper \
-    -e NOTIFICATION_INTERVAL=0 -e GRAPHITE_HOST=192.168.42.64:8080 \
+    -e NOTIFICATION_INTERVAL=0 -e GRAPHITE_HOST=http://192.168.42.64:8080 \
     -e APIUSER=root -e APIPASS=PASS -e ICINGA_PASS="icinga" \
     -e MAILSERVER="mail.example.com" -e EMAILADDR="user@example.com" -e NSCAPASS="pass" -e NSCAPORT="5667" \
     --name icinga2 -t adito/icinga2
