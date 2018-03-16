@@ -19,23 +19,6 @@ else
 
 	echo "Set permissions of $MYSQLNEW" >> output.log
 
-#	if [ ! -d "$MYSQLNEW/mysql" ]; then
-#		echo "copy $MYSQLOLD/mysql $MYSQLNEW" >> output.log
-#		cp -R $MYSQLOLD/mysql $MYSQLNEW
-#	fi
-#	if [ ! -d "$MYSQLNEW/graphite" ]; then
-#		echo "copy $MYSQLOLD/graphite $MYSQLNEW/" >> output.log
-#		cp -R $MYSQLOLD/graphite $MYSQLNEW/
-#	fi
-#	if [ ! -d "$MYSQLNEW/icinga2idomysql" ]; then
-#		echo "copy $MYSQLOLD/icinga2idomysql $MYSQLNEW/" >> output.log
-#		cp -R $MYSQLOLD/icinga2idomysql $MYSQLNEW/
-#	fi
-#	if [ ! -d "$MYSQLNEW/icingaweb" ]; then
-#		echo "copy $MYSQLOLD/icingaweb $MYSQLNEW/" >> output.log
-#		cp -R $MYSQLOLD/icingaweb $MYSQLNEW/
-#	fi
-
 	#Change default path for mysql
 	sed -i "s#datadir.*#datadir = /mysql#g" $MYSQLCONF
 
@@ -208,6 +191,17 @@ else
 		echo "}" >> /icinga2conf/api-users.conf
 	fi
 fi
+
+#check, if it's needed to disable service "swap" for monitoring host self
+if [ "$SWAPSERVICEOFF" = "true" ] || [ "$SWAPSERVICEOFF" = "TRUE" ] || [ "$SWAPSERVICEOFF" = "1" ]; then
+	sed -i '/apply Service "swap" {/','/}/d' /etc/icinga2/conf.d/services.conf
+fi
+
+#var to disable disk check 
+if [ "$DISCSERVICEOFF" = "true" ] || [ "$DISCSERVICEOFF" = "TRUE" ] || [ "$DISCSERVICEOFF" = "1" ]; then
+	sed -i '/apply Service for (disk => config in host.vars.disks) {/','/}/d' /etc/icinga2/conf.d/services.conf
+fi
+
 
 #check if AD Auth is enabled
 if [[ $ENABLE_AD_AUTH -eq "1" ]]; then

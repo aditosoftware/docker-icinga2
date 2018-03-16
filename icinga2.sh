@@ -70,11 +70,6 @@ apt-get install icinga2-classicui -y
 #Add User root to htpasswd.root. Pass root
 htpasswd -b /etc/icinga2-classicui/htpasswd.users icingaadmin $ICINGA_PASS
 
-#Classic UI Installation
-#http://localhost/icinga2-classicui/
-#Login:icingaadmin
-#Password:xxxxxxxx
-
 #---------------------------------------------------------------------------------------------------
 #Icinga Web 2 installation
 apt-get install make apache2 git zend-framework libapache2-mod-php php-mcrypt apache2-utils php-mysql php-ldap -y

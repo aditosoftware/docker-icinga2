@@ -72,6 +72,14 @@ Graphite running on port **8080**
   Password for api user. If not defined set default to "icingaapi2012m"
     
     APIPASS=apipass
+
+  Remove monitoring service "swap" of the monitoring server self, for example if this container running in k8s (the swap is not enabled in kubernetes cluster)
+
+    SWAPSERVICEOFF=true
+
+  Remove monitoring service "disk" of the monitoring server self
+
+    DISCSERVICEOFF=true
   
   !Define host name
   
@@ -108,5 +116,14 @@ Graphite running on port **8080**
     -e APIUSER=root -e APIPASS=PASS -e ICINGA_PASS="icinga" \
     -e MAILSERVER="mail.example.com" -e EMAILADDR="user@example.com" -e NSCAPASS="pass" -e NSCAPORT="5667" \
     --name icinga2 -t adito/icinga2
-    
-    
+
+## Example 3 (without AD and running in k8s cluster (disable swap and disk service))
+
+    sudo docker run -i -p 80:80 -p 5667:5667 -p 5665:5665 -p 8080:8080 -h monitoring.example.com \
+    -v /storage/icingaweb2:/icingaweb2 -v /storage/icinga2:/icinga2conf -v /storage/mysql:/mysql \
+    -v /storage/graphite:/var/lib/graphite/whisper \
+    -e NOTIFICATION_INTERVAL=0 -e GRAPHITE_HOST=http://192.168.42.64:8080 \
+    -e APIUSER=root -e APIPASS=PASS -e ICINGA_PASS="icinga" \
+    -e SWAPSERVICEOFF=true -e DISCSERVICEOFF=true \
+    -e MAILSERVER="mail.example.com" -e EMAILADDR="user@example.com" -e NSCAPASS="pass" -e NSCAPORT="5667" \
+    --name icinga2 -t adito/icinga2
