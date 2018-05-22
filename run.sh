@@ -292,6 +292,10 @@ service nsca stop
 /etc/init.d/supervisor stop
 service carbon-cache restart
 
+#disable compatlog (https://www.icinga.com/docs/icinga2/latest/doc/14-features/#compat-log-files)
+#folder /var/log/icinga2/compat		
+icinga2 feature disable compatlog
+
 #enable api again
 icinga2 feature enable api
 service icinga2 restart
