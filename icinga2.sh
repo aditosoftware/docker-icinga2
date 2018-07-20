@@ -13,7 +13,7 @@ apt-get install python-software-properties software-properties-common apache2 vi
 #add-apt-repository ppa:formorer/icinga -y
 
 wget -O - http://packages.icinga.org/icinga.key | apt-key add -
-echo 'deb http://packages.icinga.org/ubuntu icinga-xenial main' > /etc/apt/sources.list.d/icinga-main-xenial.list
+echo 'deb http://packages.icinga.org/ubuntu icinga-xenial-giraffe main' > /etc/apt/sources.list.d/icinga-main-xenial.list
 
 apt-get update
 apt-get upgrade -y
