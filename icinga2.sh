@@ -316,3 +316,6 @@ sed -i 's#command_file.*#command_file=/var/run/icinga2/cmd/icinga2.cmd#g' /etc/n
 graphite-manage migrate
 graphite-manage migrate auth
 unset DEBIAN_FRONTEND
+
+#fix error
+sed -i "s/#LimitNPROC=62883/LimitNPROC=62883/g" /etc/systemd/system/icinga2.service.d/limits.conf

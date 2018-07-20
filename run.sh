@@ -286,9 +286,6 @@ sed -i "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
 #Change timezone for graphite to Europe/Berlin
 echo "TIME_ZONE = 'Europe/Berlin'" >> /etc/graphite/local_settings.py
 
-#fix error
-sed -i "s/#LimitNPROC=62883/LimitNPROC=62883/g" /etc/systemd/system/icinga2.service.d/limits.conf
-
 #Restart service
 service apache2 stop
 service nsca stop
