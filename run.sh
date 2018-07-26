@@ -269,7 +269,7 @@ echo "configure icingaweb user $pass" >> output.log
 if [ "$ENABLEGRAPHITE" = "true" ] || [ "$ENABLEGRAPHITE" = "TRUE" ] || [ "$ENABLEGRAPHITE" = "1" ]; then
 cat > /etc/icingaweb2/modules/graphite/config.ini << EOF
 [graphite]
-url = "$GRAPHITE_TRANS://$GRAPHITE_HOST:$GRAPHITE_WEBSITE_PORT"
+url = "$GRAPHITE_TRANS://$GRAPHITE_WEBHOST:$GRAPHITE_WEBSITE_PORT"
 user = "$GRAPHITE_USER"
 password = "$GRAPHITE_PASS"
 insecure = "$GRAPHITE_SECUR"

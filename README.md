@@ -47,7 +47,7 @@ Icinga2 NSCA on port **5667** (for receive passive checks)
 
   Graphite host
     
-    GRAPHITE_HOST=192.168.100.203
+    GRAPHITE_WEBHOST=192.168.100.203
   
   Graphite port for website
 
@@ -64,6 +64,10 @@ Icinga2 NSCA on port **5667** (for receive passive checks)
   Graphite security, this option will be need for icinga2 to send the data, it's meen ssl or not
 
     GRAPHITE_SECUR = 0/1
+
+  Graphite port for file /etc/icinga2/feature-available/graphite.conf
+
+    GRAPHITE_HOST
 
   Graphite host (default 2003), but you need to define this
 
