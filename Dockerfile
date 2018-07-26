@@ -5,7 +5,8 @@ COPY run.sh /
 COPY nsca.conf /etc/supervisor/conf.d/nsca.conf
 COPY apache2_supervisor.conf /etc/supervisor/conf.d/apache2.conf
 
-RUN chmod +x /tmp/install.sh && chmod +x /run.sh && /tmp/install.sh
+RUN chmod +x /tmp/install.sh && chmod +x /run.sh 
+RUN /tmp/install.sh
 
 VOLUME ["/icinga2conf","/mysql","/icingaweb2"]
 

@@ -25,8 +25,10 @@ EOF
 
 #Configure icinga2 ido-mysql
 service mysql start
+sleep 3
 mysqladmin -u root password root
-mysql -uroot -proot -e "CREATE DATABASE icinga2idomysql CHARACTER SET latin1;"
+sleep 3
+mysql -uroot -proot -e "CREATE DATABASE icinga2idomysql CHARACTER SET latin1 COLLATE latin1_general_ci;"
 mysql -uroot -proot -e "update mysql.user set password=password('root') where user='root';"
 mysql -uroot -proot -e "update mysql.user set plugin='' where user='root';"
 mysql -uroot -proot -e "flush privileges;"
