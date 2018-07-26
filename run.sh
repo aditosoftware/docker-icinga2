@@ -39,16 +39,6 @@ else
 	fi
 fi
 
-#set graphite folder permissions
-chown -R _graphite:_graphite /var/lib/graphite/whisper
-
-#disable main log
-icinga2 feature disable mainlog
-
-#set port 8080 for graphite webgui
-sed -i 's/:80>/:8080>/g' /etc/apache2/sites-enabled/graphite.conf
-sed -i "1s/.*/LISTEN 8080/g" /etc/apache2/ports.conf
-
 #write html redirect
 rm -Rf /var/www/html/index.html
 cat > /var/www/html/index.php << EOF
@@ -65,6 +55,7 @@ if [ -z "$ICINGA_PASS" ]; then
 else
 	echo $ICINGA_PASS
 fi
+
 #check graphitehost variable
 if [ -z "GRAPHITE_HOST" ]; then
 	echo "Graphite Host not defined.Exit"
@@ -72,6 +63,7 @@ if [ -z "GRAPHITE_HOST" ]; then
 else
 	echo $GRAPHITE_HOST
 fi
+
 #check mailserver variable
 if [ -z "MAILSERVER" ]; then
 	echo "Mailserver not defined"
@@ -80,6 +72,7 @@ else
 	sed -i 's#/usr/bin/.*#/usr/bin/printf \"%b\" \"$template\" | mailx -r '\"monitoring@$HOSTNAME\"' -s \"$NOTIFICATIONTYPE - $HOSTDISPLAYNAME is $HOSTSTATE\" -S smtp='\"$MAILSERVER\"' $USEREMAIL#g' /etc/icinga2/scripts/mail-host-notification.sh
 	sed -i 's#/usr/bin/.*#/usr/bin/printf \"%b\" \"$template\" | mailx -r '\"monitoring@$HOSTNAME\"' -s \"$NOTIFICATIONTYPE - $HOSTDISPLAYNAME - $SERVICEDISPLAYNAME is $SERVICESTATE\" -S smtp='\"$MAILSERVER\"' $USEREMAIL#g' /etc/icinga2/scripts/mail-service-notification.sh
 fi
+
 #check email variable
 if [ -z "$EMAILADDR" ]; then
 	echo "Email for icingaadmin not defined"
@@ -87,12 +80,14 @@ else
 	sed -i "11s/.*/enable_notifications = true/g" /etc/icinga2/conf.d/users.conf
 	sed -i 's/'"root@localhost"'/'"$EMAILADDR"'/' /etc/icinga2/conf.d/users.conf
 fi
+
 #check if NSCA Password is defined
 if [ -z "$NSCAPASS" ]; then
 	echo "nsca password not defined"
 else
 	echo "password=$NSCAPASS" >> /etc/nsca.cfg
 fi
+
 #check if NSCA Port ist defined. If not define set stardardport 5667
 if [ -z "$NSCAPORT" ]; then
 	sed -i "s/server_port.*/server_port=5667/g" /etc/nsca.cfg
@@ -165,9 +160,6 @@ else
 		fi
 	fi
 fi
-
-#Enable API
-icinga2 api setup
 
 #check apipass variable
 if [ -z "$APIUSER" ]; then
@@ -269,36 +261,46 @@ if [[ ! -s /icinga2conf/passive.conf ]]; then
 	echo "} " >> /icinga2conf/passive.conf
 fi
 
-#Set password for icinga2-classicui (http://server.local/icinga2-classicui
-htpasswd -b /etc/icinga2-classicui/htpasswd.users icingaadmin $ICINGA_PASS
-#Generate password hash for icingaweb user (http://server.local/icinga2-classicui)
 pass=$(openssl passwd -1 $ICINGA_PASS)
-
 mysql -uroot -proot icingaweb -e "update icingaweb_user set password_hash='$pass' where name='icingaadmin';"
 echo "configure icingaweb user $pass" >> output.log
 
-#Change Graphite host
-sed -i "s#base.*#base_url=$GRAPHITE_HOST/render?#" /etc/icingaweb2/modules/graphite/config.ini
+#Enable Graphite
+if [ "$ENABLEGRAPHITE" = "true" ] || [ "$ENABLEGRAPHITE" = "TRUE" ] || [ "$ENABLEGRAPHITE" = "1" ]; then
+cat > /etc/icingaweb2/modules/graphite/config.ini << EOF
+[graphite]
+url = "$GRAPHITE_TRANS://$GRAPHITE_HOST:$GRAPHITE_WEBSITE_PORT"
+user = "$GRAPHITE_USER"
+password = "$GRAPHITE_PASS"
+insecure = "$GRAPHITE_SECUR"
+EOF
+cat > /etc/icinga2/features-available/graphite.conf << EOF
+library "perfdata"
+object GraphiteWriter "graphite" {
+  host = "$GRAPHITE_HOST"
+  port = $GRAPHITE_PORT
+  enable_send_thresholds = true
+}
+EOF
+
+  icinga2 feature enable graphite
+fi
+
+if [ "$REMOVEDEFAULTSVC" = "true" ] || [ "$REMOVEDEFAULTSVC" = "TRUE" ] || [ "$REMOVEDEFAULTSVC" = "1" ]; then
+  rm -rf /etc/icinga2/conf.d/services.conf
+fi
+
 
 #Change permissions icingaweb2 and icinga2 custom configuration folder
 sed -i "s/vars.os.*/#vars.os = \"Linux\"/g" /etc/icinga2/conf.d/hosts.conf
-
-#Change timezone for graphite to Europe/Berlin
-echo "TIME_ZONE = 'Europe/Berlin'" >> /etc/graphite/local_settings.py
 
 #Restart service
 service apache2 stop
 service nsca stop
 /etc/init.d/supervisor stop
-service carbon-cache restart
 
-#disable compatlog (https://www.icinga.com/docs/icinga2/latest/doc/14-features/#compat-log-files)
-#folder /var/log/icinga2/compat		
-icinga2 feature disable compatlog
-
-#enable api again
-icinga2 feature enable api
-service icinga2 restart
+#Start icinga2
+service icinga2 start
 
 rm /etc/init.d/apache2
 rm /etc/init.d/nsca

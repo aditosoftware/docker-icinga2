@@ -4,16 +4,16 @@ This is a Docker container with Icinga2 (Icingaweb2 and Icinag2-Classicui).
 
 ### Update
 
-1. Update to icinga2 v2.8.1-1 and icingaweb2 2.5.1
-2. Now with Ubutu 16.04
-3. Add supervisor service
+1. Update to icinga2 v2.9.1-1 and icingaweb2 2.6.0 
+2. Now with Ubutu 18.04 
+3. Add supervisor service 
+4. Removed graphite from container, you need now a separated container with graphite 
 
 ### Ports
 
-Icinga2 running on port **80** (redirect to host/icingaweb2)
-Icinga2 API on port **5665** (don't forgot to set user and password)
-Icinga2 NSCA on port **5667** (for receive passive checks)
-Graphite running on port **8080**
+Icinga2 running on port **80** (redirect to host/icingaweb2) 
+Icinga2 API on port **5665** (don't forgot to set user and password) 
+Icinga2 NSCA on port **5667** (for receive passive checks) 
 
 ## Variables
 
@@ -37,9 +37,37 @@ Graphite running on port **8080**
   
     AD_BIND_PW=PASSWORDHERE (optional)
   
-  Graphite host with port. Graphite is installed in container you need to change here the ip to Docker container and port
+  Enable Graphite
+
+    ENABLEGRAPHITE=true/TRUE/0
+
+  Graphite transport port
+
+    GRAPHITE_TRANS=http or https
+
+  Graphite host
     
-    GRAPHITE_HOST=192.168.100.203:8080 (Website port)
+    GRAPHITE_HOST=192.168.100.203
+  
+  Graphite port for website
+
+    GRAPHITE_WEBSITE_PORT = 
+
+  Graphite user
+
+    GRAPHITE_USER=
+
+  Graphite pass
+
+    GRAPHITE_PASS=
+
+  Graphite security, this option will be need for icinga2 to send the data, it's meen ssl or not
+
+    GRAPHITE_SECUR = 0/1
+
+  Graphite host (default 2003), but you need to define this
+
+    GRAPHITE_PORT = 2003
   
   Notification Periode (0 for disable, default 30Min)(optional). If set to 0, Icinga will send notificaton only if status of service is changed.
   
@@ -81,6 +109,10 @@ Graphite running on port **8080**
 
     DISCSERVICEOFF=true
   
+  Remove default services (serices.conf)
+
+    REMOVEDEFAULTSVC = true/TRUE/1
+  
   !Define host name
   
     docker run -h "hostname"
@@ -103,7 +135,7 @@ Graphite running on port **8080**
     -v /storage/icingaweb2:/icingaweb2 -v /storage/icinga2:/icinga2conf -v /storage/mysql:/mysql \
     -e ENABLE_AD_AUTH="1" -e AD_NAME="example.com" -e AD_ROOT_DN="OU=accounts,OU=intern,DC=example,DC=com" \
     -e AD_BIND_DN="CN=Icinga2 Auth,OU=accounts,OU=intern,DC=example,DC=com" -e AD_BIND_PW="PASSWORDHERE" \
-    -e NOTIFICATION_INTERVAL=0 -e GRAPHITE_HOST=http://192.168.100.61:8080 -e ICINGA_PASS="icinga" -e MAILSERVER="mail.example.com" \
+    -e NOTIFICATION_INTERVAL=0 ENABLEGRAPHITE=true -e GRAPHITE_TRANS=http -e GRAPHITE_HOST=192.168.42.59 -e GRAPHITE_WEBSITE_PORT=8081 -e GRAPHITE_USER=guest -e GRAPHITE_PASS=guest -e GRAPHITE_SECUR=0 -e GRAPHITE_PORT=2003 -e ICINGA_PASS="icinga" -e MAILSERVER="mail.example.com" \
     -e EMAILADDR="user@example.com" -e NSCAPASS="pass" -e NSCAPORT="5667" -e APIUSER=root -e APIPASS=pass \
     --name icinga2 -t adito/icinga2
 
@@ -112,7 +144,7 @@ Graphite running on port **8080**
     sudo docker run -i -p 80:80 -p 5667:5667 -p 5665:5665 -p 8080:8080 -h monitoring.example.com \
     -v /storage/icingaweb2:/icingaweb2 -v /storage/icinga2:/icinga2conf -v /storage/mysql:/mysql \
     -v /storage/graphite:/var/lib/graphite/whisper \
-    -e NOTIFICATION_INTERVAL=0 -e GRAPHITE_HOST=http://192.168.42.64:8080 \
+    -e NOTIFICATION_INTERVAL=0 ENABLEGRAPHITE=true -e GRAPHITE_TRANS=http -e GRAPHITE_HOST=192.168.42.59 -e GRAPHITE_WEBSITE_PORT=8081 -e GRAPHITE_USER=guest -e GRAPHITE_PASS=guest -e GRAPHITE_SECUR=0 -e GRAPHITE_PORT=2003 \
     -e APIUSER=root -e APIPASS=PASS -e ICINGA_PASS="icinga" \
     -e MAILSERVER="mail.example.com" -e EMAILADDR="user@example.com" -e NSCAPASS="pass" -e NSCAPORT="5667" \
     --name icinga2 -t adito/icinga2
@@ -122,7 +154,10 @@ Graphite running on port **8080**
     sudo docker run -i -p 80:80 -p 5667:5667 -p 5665:5665 -p 8080:8080 -h monitoring.example.com \
     -v /storage/icingaweb2:/icingaweb2 -v /storage/icinga2:/icinga2conf -v /storage/mysql:/mysql \
     -v /storage/graphite:/var/lib/graphite/whisper \
-    -e NOTIFICATION_INTERVAL=0 -e GRAPHITE_HOST=http://192.168.42.64:8080 \
+    -e NOTIFICATION_INTERVAL=0 ENABLEGRAPHITE=true \
+    -e GRAPHITE_TRANS=http -e GRAPHITE_HOST=192.168.42.59 \
+    -e GRAPHITE_WEBSITE_PORT=8081 -e GRAPHITE_USER=guest \
+    -e GRAPHITE_PASS=guest -e GRAPHITE_SECUR=0 -e GRAPHITE_PORT=2003 \
     -e APIUSER=root -e APIPASS=PASS -e ICINGA_PASS="icinga" \
     -e SWAPSERVICEOFF=true -e DISCSERVICEOFF=true \
     -e MAILSERVER="mail.example.com" -e EMAILADDR="user@example.com" -e NSCAPASS="pass" -e NSCAPORT="5667" \
