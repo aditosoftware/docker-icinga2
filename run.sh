@@ -3,36 +3,30 @@
 
 MYSQLOLD="/var/lib/mysql"
 MYSQLNEW="/mysql"
-MYSQLCONF="/etc/mysql/mysql.conf.d/mysqld.cnf"
+MYSQLCONF="/etc/mysql/mariadb.conf.d/50-server.cnf"
 
-echo "$MYSQLOLD" > /output.log
-echo "$MYSQLNEW" >> /output.log
+echo "$MYSQLOLD"
+echo "$MYSQLNEW"
 
 #Check folder /mysql. exit if not exist
 if [ ! -d "$MYSQLNEW" ]; then
-	echo "Folder $MYSQLNEW not found. Exit" >> output.log
 	echo "Folder $MYSQLNEW not found. Exit"
 	exit 1
 else
 	cp -Rn $MYSQLOLD /
-	echo "Copy $MYSQLOLD to /" >> output.log
-
-	echo "Set permissions of $MYSQLNEW" >> output.log
+	echo "Copy $MYSQLOLD to /"
 
 	#Change default path for mysql
 	sed -i "s#datadir.*#datadir = /mysql#g" $MYSQLCONF
 
 	#Change permissions icingaweb2 and icinga2 custom configuration folder
-	echo "Change permissions of $MYSQLNEW to mysql:mysql" >> output.log
+	echo "Change permissions of $MYSQLNEW to mysql:mysql"
 	chown mysql:mysql -R $MYSQLNEW
-
-	#Start MYSQL
-	service mysql restart
 
 	UP=$(ps aux | grep mysql | wc -l);
 	if [ "$UP" -ne 2 ];
 	then
-		service mysql restart
+		service mysql start
 	else
 		echo "cannot start mysql service"
 		exit 1
@@ -54,14 +48,6 @@ if [ -z "$ICINGA_PASS" ]; then
 	echo "Set icingaadmin pass to icinga"
 else
 	echo $ICINGA_PASS
-fi
-
-#check graphitehost variable
-if [ -z "GRAPHITE_HOST" ]; then
-	echo "Graphite Host not defined.Exit"
-	exit 1
-else
-	echo $GRAPHITE_HOST
 fi
 
 #check mailserver variable
@@ -146,10 +132,10 @@ if [[ -s /icinga2conf/notifications.conf ]]; then
 else
 	mv /etc/icinga2/conf.d/notifications.conf /icinga2conf/notifications.conf
 
-	interval=$(cat notifications.conf | grep interval | wc -l);
+	interval=$(cat /icinga2conf/notifications.conf | grep interval | wc -l);
 	if [ "$interval" -eq 2 ];
 	then
-		echo "interval is set"
+		echo "Icinga2 check interval is set"
 	else
 		#Check if NOTIFICATION_INTERVAL is defined
 		if [ -z "$NOTIFICATION_INTERVAL" ]; then
@@ -282,8 +268,9 @@ object GraphiteWriter "graphite" {
   enable_send_thresholds = true
 }
 EOF
-
+  
   icinga2 feature enable graphite
+
 fi
 
 if [ "$REMOVEDEFAULTSVC" = "true" ] || [ "$REMOVEDEFAULTSVC" = "TRUE" ] || [ "$REMOVEDEFAULTSVC" = "1" ]; then
