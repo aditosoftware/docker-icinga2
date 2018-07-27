@@ -41,7 +41,7 @@ icingacli setup config directory --group icingaweb2;
 icinga2 api setup
 
 #create db for ido
-mysql -uroot -proot -e "CREATE DATABASE icinga2idomysql CHARACTER SET latin1 COLLATE latin1_general_ci;"
+mysql -uroot -proot -e "CREATE DATABASE icinga2idomysql CHARACTER SET latin1;"
 mysql -uroot -proot -e "update mysql.user set password=password('root') where user='root';"
 mysql -uroot -proot -e "update mysql.user set plugin='' where user='root';"
 mysql -uroot -proot -e "flush privileges;"
@@ -56,7 +56,6 @@ mysql -uroot -proot icingaweb < /usr/share/icingaweb2/etc/schema/mysql.schema.sq
 #icingaadmin:icinga
 export pass=$(openssl passwd -1 icinga)
 mysql -uroot -proot -e  "INSERT INTO icingaweb.icingaweb_user (name, active, password_hash) VALUES ('icingaadmin', 1, '$pass');"
-#mysql -uroot -proot -e  "INSERT INTO icingaweb.icingaweb_group_membership (username) VALUES ('icingaadmin');"
 
 #authentication.ini
 cat > /etc/icingaweb2/authentication.ini << EOF
@@ -120,7 +119,7 @@ cat > /etc/icingaweb2/roles.ini << EOF
   groups = "Administrators"
 EOF
 
-# #Configuration Icingaweb Modules
+#Configuration Icingaweb Modules
 mkdir -p /etc/icingaweb2/modules/monitoring
 mkdir -p /etc/icingaweb2/enabledModules
 
@@ -167,9 +166,9 @@ ln -s /usr/share/icingaweb2/modules/graphite/ /etc/icingaweb2/enabledModules/gra
 
 mkdir -p /etc/icingaweb2/modules/graphite
 
-  #fix https://github.com/Icinga/icingaweb2-module-graphite/pull/171/files
-  sed -i '33s/protected $handles/protected $handles = []/' /etc/icingaweb2/enabledModules/graphite/library/vendor/iplx/Http/Client.php
-  sed -i '33s/$ch = $this->handles ? array_pop($this->handles) : curl_init()/$ch = ! empty($this->handles) ? array_pop($this->handles) : curl_init()/' /etc/icingaweb2/enabledModules/graphite/library/vendor/iplx/Http/Client.php
+#fix https://github.com/Icinga/icingaweb2-module-graphite/pull/171/files
+sed -i '33s/protected $handles/protected $handles = []/' /etc/icingaweb2/enabledModules/graphite/library/vendor/iplx/Http/Client.php
+sed -i '33s/$ch = $this->handles ? array_pop($this->handles) : curl_init()/$ch = ! empty($this->handles) ? array_pop($this->handles) : curl_init()/' /etc/icingaweb2/enabledModules/graphite/library/vendor/iplx/Http/Client.php
 
 #graphite config will be enabled and wrote in run.sh
 

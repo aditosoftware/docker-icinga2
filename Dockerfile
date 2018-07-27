@@ -1,7 +1,7 @@
 FROM ubuntu:bionic
 
 COPY install.sh /tmp/install.sh
-COPY run.sh /
+COPY run.sh /run.sh
 COPY nsca.conf /etc/supervisor/conf.d/nsca.conf
 COPY apache2_supervisor.conf /etc/supervisor/conf.d/apache2.conf
 

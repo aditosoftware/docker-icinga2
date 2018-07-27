@@ -249,7 +249,7 @@ fi
 
 pass=$(openssl passwd -1 $ICINGA_PASS)
 mysql -uroot -proot icingaweb -e "update icingaweb_user set password_hash='$pass' where name='icingaadmin';"
-echo "configure icingaweb user $pass" >> output.log
+echo "configure icingaweb user $pass"
 
 #Enable Graphite
 if [ "$ENABLEGRAPHITE" = "true" ] || [ "$ENABLEGRAPHITE" = "TRUE" ] || [ "$ENABLEGRAPHITE" = "1" ]; then

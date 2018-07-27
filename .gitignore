@@ -4,3 +4,5 @@ icingaweb2
 mysql
 libicinga.so
 docker-compose.yml
+install2.sh
+run2.sh
