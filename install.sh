@@ -7,6 +7,9 @@ apt update
 apt upgrade -y
 apt-get install -y --no-install-recommends apache2 ca-certificates curl dnsutils gnupg locales lsb-release mailutils mariadb-client mariadb-server php-curl php-ldap php-mysql procps pwgen supervisor unzip wget libdbd-mysql-perl
 
+#start mysql 
+service mysql start
+
 #Add icinga2 key
 curl -s https://packages.icinga.com/icinga.key | apt-key add -
 echo "deb http://packages.icinga.org/ubuntu icinga-$(lsb_release -cs) main" > /etc/apt/sources.list.d/icinga2.list
@@ -24,10 +27,7 @@ object IdoMysqlConnection "ido-mysql" {
 EOF
 
 #Configure icinga2 ido-mysql
-service mysql start
-sleep 3
 mysqladmin -u root password root
-sleep 3
 mysql -uroot -proot -e "CREATE DATABASE icinga2idomysql CHARACTER SET latin1 COLLATE latin1_general_ci;"
 mysql -uroot -proot -e "update mysql.user set password=password('root') where user='root';"
 mysql -uroot -proot -e "update mysql.user set plugin='' where user='root';"
