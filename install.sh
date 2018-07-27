@@ -28,12 +28,6 @@ EOF
 
 #Configure icinga2 ido-mysql
 mysqladmin -u root password root
-mysql -uroot -proot -e "CREATE DATABASE icinga2idomysql CHARACTER SET latin1 COLLATE latin1_general_ci;"
-mysql -uroot -proot -e "update mysql.user set password=password('root') where user='root';"
-mysql -uroot -proot -e "update mysql.user set plugin='' where user='root';"
-mysql -uroot -proot -e "flush privileges;"
-mysql -uroot -proot icinga2idomysql < /usr/share/icinga2-ido-mysql/schema/mysql.sql
-echo "date.timezone =Europe/Berlin" >> /etc/php/7.2/apache2/php.ini
 
 #enable ido
 ln -s /etc/icinga2/features-available/ido-mysql.conf /etc/icinga2/features-available/ido-myql.conf
@@ -46,6 +40,13 @@ usermod -a -G icingaweb2 www-data;
 icingacli setup config directory --group icingaweb2;
 icinga2 api setup
 
+#create db for ido
+mysql -uroot -proot -e "CREATE DATABASE icinga2idomysql CHARACTER SET latin1 COLLATE latin1_general_ci;"
+mysql -uroot -proot -e "update mysql.user set password=password('root') where user='root';"
+mysql -uroot -proot -e "update mysql.user set plugin='' where user='root';"
+mysql -uroot -proot -e "flush privileges;"
+mysql -uroot -proot icinga2idomysql < /usr/share/icinga2-ido-mysql/schema/mysql.sql
+echo "date.timezone =Europe/Berlin" >> /etc/php/7.2/apache2/php.ini
 
 #create icingaweb db
 mysql -uroot -proot -e "CREATE DATABASE icingaweb;"
