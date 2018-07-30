@@ -167,6 +167,17 @@ else
 			fi
 		echo " permissions = [ \"*\"]" >> /icinga2conf/api-users.conf
 		echo "}" >> /icinga2conf/api-users.conf
+
+    #add commandtransports.ini
+    rm -rf /etc/icingaweb2/modules/monitoring/commandtransports.ini
+cat > /etc/icingaweb2/modules/monitoring/commandtransports.ini << EOF
+[icinga2]
+  transport = "api"
+  host = "0.0.0.0"
+  port = "5665"
+  username = "$APIUSER"
+  password = "$APIPASS"
+EOF
 	fi
 fi
 
