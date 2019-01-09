@@ -167,13 +167,15 @@ else
 			fi
 		echo " permissions = [ \"*\"]" >> /icinga2conf/api-users.conf
 		echo "}" >> /icinga2conf/api-users.conf
-    
-echo "[icinga2]" > /etc/icingaweb2/modules/monitoring/commandtransports.ini
-echo "  transport = \"api\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
-echo "  port = \"5665\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
-echo "  host = \"0.0.0.0\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
-echo "  username = \"$APIUSER\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
-echo "  password = \"$APIPASS\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
+   
+    echo "[icinga2]" > /etc/icingaweb2/modules/monitoring/commandtransports.ini
+    echo "  transport = \"api\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
+    echo "  port = \"5665\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
+    echo "  host = \"0.0.0.0\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
+    echo "  username = \"$APIUSER\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
+    echo "  password = \"$APIPASS\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
+	  fi
+fi
 
 #check, if it's needed to disable service "swap" for monitoring host self
 if [ "$SWAPSERVICEOFF" = "true" ] || [ "$SWAPSERVICEOFF" = "TRUE" ] || [ "$SWAPSERVICEOFF" = "1" ]; then
