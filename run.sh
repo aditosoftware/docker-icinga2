@@ -153,7 +153,10 @@ if [ -z "$APIUSER" ]; then
 	icinga2 feature disable api
 	rm -Rf /etc/icinga2/conf.d/api-users.conf
 else
+  echo "API user defined as ${APIUSER}"
+  mkdir -p /etc/icingaweb2/modules/monitoring
 	icinga2 feature enable api
+
 		if [[ -s /icinga2conf/api-users.conf ]]; then
 			rm /etc/icinga2/conf.d/api-users.conf
 		else
@@ -165,16 +168,18 @@ else
 			else
 				echo "password = \"$APIPASS\" " >> /icinga2conf/api-users.conf
 			fi
-		echo " permissions = [ \"*\"]" >> /icinga2conf/api-users.conf
-		echo "}" >> /icinga2conf/api-users.conf
-    
-    echo "[icinga2]" > /etc/icingaweb2/modules/monitoring/commandtransports.ini
-    echo "  transport = \"api\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
-    echo "  port = \"5665\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
-    echo "  host = \"0.0.0.0\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
-    echo "  username = \"$APIUSER\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
-    echo "  password = \"$APIPASS\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
+		
+      echo " permissions = [ \"*\"]" >> /icinga2conf/api-users.conf
+		  echo "}" >> /icinga2conf/api-users.conf
     fi 
+  
+  #create access data to use in icinga2 (to set acknowledge, downtime, etc)
+  echo "[icinga2]" > /etc/icingaweb2/modules/monitoring/commandtransports.ini
+  echo "  transport = \"api\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
+  echo "  port = \"5665\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
+  echo "  host = \"0.0.0.0\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
+  echo "  username = \"$APIUSER\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
+  echo "  password = \"$APIPASS\" " >> /etc/icingaweb2/modules/monitoring/commandtransports.ini
 fi 
 #check, if it's needed to disable service "swap" for monitoring host self
 if [ "$SWAPSERVICEOFF" = "true" ] || [ "$SWAPSERVICEOFF" = "TRUE" ] || [ "$SWAPSERVICEOFF" = "1" ]; then

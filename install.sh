@@ -133,16 +133,6 @@ cat > /etc/icingaweb2/modules/monitoring/backends.ini << EOF
   resource = "icinga_ido"
 EOF
 
-#commandtransports.ini
-cat > /etc/icingaweb2/modules/monitoring/commandtransports.ini << EOF
-[icinga2]
-  transport = "api"
-  host = "0.0.0.0"
-  port = "5665"
-  username = "root"
-  password = "d2b4193d8549d6e4"
-EOF
-
 #config.ini
 cat > /etc/icingaweb2/modules/monitoring/config.ini << EOF
 [security]
