@@ -4,7 +4,7 @@ This is a Docker container with Icinga2 (Icingaweb2 and Icinag2-Classicui).
 
 ### Update
 
-1. Update to icinga2 r2.10.5-1 and icingaweb2 2.6.3
+1. Update to icinga2 2.11.2-1 and icingaweb2 2.7.3
 2. Now with Ubutu 18.04 
 3. Add supervisor service 
 4. Removed graphite from container, you need now a separated container with graphite 
